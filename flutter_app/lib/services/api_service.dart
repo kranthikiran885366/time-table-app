@@ -192,19 +192,24 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 400) {
         // Both success and validation errors return JSON
         try {
-          return jsonDecode(response.body);
+          final jsonResponse = jsonDecode(response.body);
+          return jsonResponse ?? {'success': false, 'message': 'Empty response from server', 'errorCode': 'EMPTY_RESPONSE'};
         } catch (e) {
-          throw Exception('Invalid response format from server');
+          throw Exception('Invalid response format from server: ${response.body.substring(0, 100)}');
         }
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         throw Exception('Authentication failed. Please login again.');
       } else if (response.statusCode == 413) {
         throw Exception('File too large. Maximum size is 5MB.');
       } else if (response.statusCode == 500) {
-        final body = jsonDecode(response.body);
-        throw Exception(body['message'] ?? 'Server error occurred');
+        try {
+          final body = jsonDecode(response.body);
+          throw Exception(body['message'] ?? 'Server error occurred');
+        } catch (_) {
+          throw Exception('Server error: ${response.body.substring(0, 100)}');
+        }
       } else {
-        throw Exception('Upload failed with status ${response.statusCode}');
+        throw Exception('Upload failed with status ${response.statusCode}: ${response.body}');
       }
     } on http.ClientException catch (e) {
       throw Exception('Network error: ${e.message}');

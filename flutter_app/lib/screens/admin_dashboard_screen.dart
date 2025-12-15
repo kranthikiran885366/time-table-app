@@ -9,9 +9,9 @@ import 'faculty_workload_screen.dart';
 import 'room_utilization_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
-  final Map<String, dynamic> user;
+  final Map<String, dynamic>? user;
 
-  const AdminDashboardScreen({Key? key, required this.user}) : super(key: key);
+  const AdminDashboardScreen({Key? key, this.user}) : super(key: key);
 
   @override
   State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
@@ -104,7 +104,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 CircleAvatar(
                                   radius: 30,
                                   child: Text(
-                                    widget.user['name']?[0].toUpperCase() ?? 'A',
+                                    widget.user?['name']?[0].toUpperCase() ?? 'A',
                                     style: const TextStyle(fontSize: 24),
                                   ),
                                 ),
@@ -114,12 +114,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Welcome, ${widget.user['name'] ?? 'Admin'}',
+                                        'Welcome, ${widget.user?['name'] ?? 'Admin'}',
                                         style: Theme.of(context).textTheme.titleLarge,
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        widget.user['role']?.toUpperCase() ?? 'ADMIN',
+                                        widget.user?['role']?.toUpperCase() ?? 'ADMIN',
                                         style: Theme.of(context).textTheme.bodySmall,
                                       ),
                                     ],
@@ -167,14 +167,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     if (_stats == null) return const SizedBox();
 
     final items = [
-      {'icon': Icons.school, 'label': 'Faculty', 'value': _stats!.overview.totalFaculty, 'color': Colors.blue},
-      {'icon': Icons.business, 'label': 'Departments', 'value': _stats!.overview.totalDepartments, 'color': Colors.green},
-      {'icon': Icons.meeting_room, 'label': 'Rooms', 'value': _stats!.overview.totalRooms, 'color': Colors.orange},
-      {'icon': Icons.class_, 'label': 'Sections', 'value': _stats!.overview.totalSections, 'color': Colors.purple},
-      {'icon': Icons.book, 'label': 'Subjects', 'value': _stats!.overview.totalSubjects, 'color': Colors.teal},
-      {'icon': Icons.calendar_today, 'label': 'Classes', 'value': _stats!.overview.totalClasses, 'color': Colors.indigo},
-      {'icon': Icons.announcement, 'label': 'Announcements', 'value': _stats!.overview.activeAnnouncements, 'color': Colors.red},
-      {'icon': Icons.cloud_done, 'label': 'System', 'value': _stats!.systemHealth.apiStatus == 'operational' ? 'Online' : 'Offline', 'color': Colors.cyan},
+      {'icon': Icons.school, 'label': 'Faculty', 'value': _stats!.overview.totalFaculty, 'color': Colors.blue, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => FacultyWorkloadScreen()))},
+      {'icon': Icons.business, 'label': 'Departments', 'value': _stats!.overview.totalDepartments, 'color': Colors.green, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DepartmentManagementScreen()))},
+      {'icon': Icons.meeting_room, 'label': 'Rooms', 'value': _stats!.overview.totalRooms, 'color': Colors.orange, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => RoomUtilizationScreen()))},
+      {'icon': Icons.class_, 'label': 'Sections', 'value': _stats!.overview.totalSections, 'color': Colors.purple, 'onTap': () => Navigator.pushNamed(context, '/upload-timetable')},
+      {'icon': Icons.book, 'label': 'Subjects', 'value': _stats!.overview.totalSubjects, 'color': Colors.teal, 'onTap': () => Navigator.pushNamed(context, '/upload-timetable')},
+      {'icon': Icons.calendar_today, 'label': 'Classes', 'value': _stats!.overview.totalClasses, 'color': Colors.indigo, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => AnalyticsDashboardScreen()))},
+      {'icon': Icons.announcement, 'label': 'Announcements', 'value': _stats!.overview.activeAnnouncements, 'color': Colors.red, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AnnouncementManagementScreen()))},
+      {'icon': Icons.cloud_done, 'label': 'System', 'value': _stats!.systemHealth.apiStatus == 'operational' ? 'Online' : 'Offline', 'color': Colors.cyan, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ActivityLogScreen()))},
     ];
 
     return GridView.count(
@@ -188,9 +188,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         return Card(
           elevation: 2,
           child: InkWell(
-            onTap: () {
-              // Navigate to relevant screen
-            },
+            onTap: item['onTap'] as VoidCallback,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -271,9 +269,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   Widget _buildAnalyticsCards() {
     final cards = [
-      {'icon': Icons.insert_chart, 'label': 'Analytics Dashboard', 'subtitle': 'View detailed analytics', 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AnalyticsDashboardScreen()))},
-      {'icon': Icons.people, 'label': 'Faculty Workload', 'subtitle': 'Monitor faculty schedules', 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FacultyWorkloadScreen()))},
-      {'icon': Icons.meeting_room, 'label': 'Room Utilization', 'subtitle': 'Track room usage', 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RoomUtilizationScreen()))},
+      {'icon': Icons.insert_chart, 'label': 'Analytics Dashboard', 'subtitle': 'View detailed analytics', 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => AnalyticsDashboardScreen()))},
+      {'icon': Icons.people, 'label': 'Faculty Workload', 'subtitle': 'Monitor faculty schedules', 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => FacultyWorkloadScreen()))},
+      {'icon': Icons.meeting_room, 'label': 'Room Utilization', 'subtitle': 'Track room usage', 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => RoomUtilizationScreen()))},
     ];
 
     return Column(

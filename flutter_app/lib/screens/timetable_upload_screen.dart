@@ -32,7 +32,7 @@ class _TimetableUploadScreenState extends State<TimetableUploadScreen> {
 
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['xlsx'],
+        allowedExtensions: ['xlsx', 'xls', 'xlsm', 'xlsb', 'xltx', 'xltm'],
         withData: true,
       );
 
@@ -206,10 +206,11 @@ class _TimetableUploadScreenState extends State<TimetableUploadScreen> {
       });
 
       if (result['success'] == true) {
-        final summary = result['summary'];
+        final summary = result['summary'] ?? {};
+        final saved = result['saved'] ?? {};
         final message = _isDryRun 
-          ? '✅ Validation successful!\n\nTotal: ${summary['totalEntries']} entries\nValid: ${summary['validEntries']}\nReady to upload.'
-          : '✅ Upload successful!\n\nInserted: ${result['saved']['inserted']}\nDeleted: ${result['saved']['deleted']}\nFailed: ${result['saved']['failed']}';
+          ? '✅ Validation successful!\n\nTotal: ${summary['totalEntries'] ?? 0} entries\nValid: ${summary['validEntries'] ?? 0}\nReady to upload.'
+          : '✅ Upload successful!\n\nInserted: ${saved['inserted'] ?? 0}\nDeleted: ${saved['deleted'] ?? 0}\nFailed: ${saved['failed'] ?? 0}';
         
         _showSuccessDialog(
           _isDryRun ? 'Validation Complete' : 'Upload Complete',
@@ -218,10 +219,11 @@ class _TimetableUploadScreenState extends State<TimetableUploadScreen> {
       } else {
         final errorCode = result['errorCode'] ?? 'UNKNOWN';
         final hint = result['hint'] ?? '';
+        final message = result['message'] ?? 'Upload failed';
         
         _showErrorDialog(
           'Upload Failed',
-          '${result['message']}\n\n${hint.isNotEmpty ? 'Hint: $hint' : ''}\n\nError Code: $errorCode',
+          '$message\n\n${hint.isNotEmpty ? 'Hint: $hint' : ''}\n\nError Code: $errorCode',
         );
       }
     } on Exception catch (e) {
@@ -359,7 +361,7 @@ class _TimetableUploadScreenState extends State<TimetableUploadScreen> {
                     OutlinedButton.icon(
                       onPressed: _isUploading ? null : _pickFile,
                       icon: const Icon(Icons.folder_open),
-                      label: const Text('Choose Excel File (.xlsx)'),
+                      label: const Text('Choose Excel File (.xlsx, .xls, .xlsm, etc.)'),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.all(16),
                         minimumSize: const Size(double.infinity, 50),
@@ -592,17 +594,17 @@ class _TimetableUploadScreenState extends State<TimetableUploadScreen> {
             
             // Summary Stats
             if (summary != null) ...[
-              _buildStatRow('Total Sheets', summary['totalSheets'].toString(), Icons.table_chart),
-              _buildStatRow('Total Entries', summary['totalEntries'].toString(), Icons.grid_on),
-              _buildStatRow('Valid Entries', summary['validEntries'].toString(), Icons.check, Colors.green),
-              if (summary['invalidEntries'] > 0)
-                _buildStatRow('Invalid Entries', summary['invalidEntries'].toString(), Icons.warning, Colors.orange),
-              if (summary['errors'] > 0)
-                _buildStatRow('Errors', summary['errors'].toString(), Icons.error, Colors.red),
-              if (summary['warnings'] > 0)
-                _buildStatRow('Warnings', summary['warnings'].toString(), Icons.info, Colors.orange),
-              if (summary['conflicts'] > 0)
-                _buildStatRow('Conflicts', summary['conflicts'].toString(), Icons.priority_high, Colors.red),
+              _buildStatRow('Total Sheets', (summary['totalSheets'] ?? 0).toString(), Icons.table_chart),
+              _buildStatRow('Total Entries', (summary['totalEntries'] ?? 0).toString(), Icons.grid_on),
+              _buildStatRow('Valid Entries', (summary['validEntries'] ?? 0).toString(), Icons.check, Colors.green),
+              if ((summary['invalidEntries'] as int? ?? 0) > 0)
+                _buildStatRow('Invalid Entries', (summary['invalidEntries'] ?? 0).toString(), Icons.warning, Colors.orange),
+              if ((summary['errors'] as int? ?? 0) > 0)
+                _buildStatRow('Errors', (summary['errors'] ?? 0).toString(), Icons.error, Colors.red),
+              if ((summary['warnings'] as int? ?? 0) > 0)
+                _buildStatRow('Warnings', (summary['warnings'] ?? 0).toString(), Icons.info, Colors.orange),
+              if ((summary['conflicts'] as int? ?? 0) > 0)
+                _buildStatRow('Conflicts', (summary['conflicts'] ?? 0).toString(), Icons.priority_high, Colors.red),
             ],
             
             // Errors

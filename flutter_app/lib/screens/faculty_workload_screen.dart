@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../models/analytics.dart';
 
-class Faculty WorkloadScreen extends StatefulWidget {
+class FacultyWorkloadScreen extends StatefulWidget {
   const FacultyWorkloadScreen({Key? key}) : super(key: key);
 
   @override

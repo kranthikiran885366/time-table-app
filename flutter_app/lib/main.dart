@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
             );
           } else if (settings.name == '/admin-dashboard') {
             return MaterialPageRoute(
-              builder: (context) => const AdminDashboardScreen(),
+              builder: (context) => AdminDashboardScreen(),
             );
           } else if (settings.name == '/department-management') {
             return MaterialPageRoute(
@@ -69,11 +69,11 @@ class MyApp extends StatelessWidget {
             );
           } else if (settings.name == '/faculty-workload') {
             return MaterialPageRoute(
-              builder: (context) => const FacultyWorkloadScreen(),
+              builder: (context) => FacultyWorkloadScreen(),
             );
           } else if (settings.name == '/room-utilization') {
             return MaterialPageRoute(
-              builder: (context) => const RoomUtilizationScreen(),
+              builder: (context) => RoomUtilizationScreen(),
             );
           }
           return null;

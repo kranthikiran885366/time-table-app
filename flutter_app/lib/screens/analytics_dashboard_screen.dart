@@ -3,7 +3,7 @@ import 'faculty_workload_screen.dart';
 import 'room_utilization_screen.dart';
 
 class AnalyticsDashboardScreen extends StatelessWidget {
-  const AnalyticsDashboardScreen({Key? key}) : super(key: key);
+  AnalyticsDashboardScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class AnalyticsDashboardScreen extends StatelessWidget {
             Colors.blue,
             () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const FacultyWorkloadScreen()),
+              MaterialPageRoute(builder: (_) => FacultyWorkloadScreen()),
             ),
           ),
           _buildAnalyticsCard(
@@ -34,7 +34,7 @@ class AnalyticsDashboardScreen extends StatelessWidget {
             Colors.green,
             () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const RoomUtilizationScreen()),
+              MaterialPageRoute(builder: (_) => RoomUtilizationScreen()),
             ),
           ),
           _buildAnalyticsCard(
