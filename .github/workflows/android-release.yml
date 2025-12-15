@@ -1,0 +1,146 @@
+name: Android APK Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.38.3'
+        channel: 'stable'
+    
+    - name: Get dependencies
+      working-directory: ./flutter_app
+      run: flutter pub get
+    
+    - name: Update API URL for production
+      working-directory: ./flutter_app
+      run: |
+        sed -i "s|static const String baseUrl = 'http://localhost:5000/api';|static const String baseUrl = 'https://time-table-app-exrd.onrender.com/api';|g" lib/services/api_service.dart
+    
+    - name: Build APK
+      working-directory: ./flutter_app
+      run: flutter build apk --release --split-per-abi
+    
+    - name: Build Universal APK
+      working-directory: ./flutter_app
+      run: flutter build apk --release
+    
+    - name: Get version from tag
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.version.outputs.VERSION }}
+        release_name: Timetable App v${{ steps.version.outputs.VERSION }}
+        body: |
+          ## 📱 Timetable Management App - Release v${{ steps.version.outputs.VERSION }}
+          
+          ### 📥 Download APK
+          
+          **Universal APK (Recommended):**
+          - Works on all Android devices
+          - Larger file size (~50 MB)
+          
+          **Split APKs (Smaller size):**
+          - ARM 64-bit: For most modern phones
+          - ARM 32-bit: For older devices
+          - x86 64-bit: For emulators/Intel devices
+          
+          ### 🚀 Installation
+          1. Download the APK file
+          2. Enable "Install from unknown sources" in Android settings
+          3. Install the APK
+          4. Login with your credentials
+          
+          ### 🔑 Admin Credentials
+          - Email: 231fa04a02@gmail.com
+          - Password: admin123
+          
+          ### ✨ Features
+          - Section Management
+          - Excel Timetable Upload (Strict Parser)
+          - Faculty & Room Management
+          - Real-time Notifications
+          - Analytics Dashboard
+          
+          ### 📋 Requirements
+          - Android 5.0 (API 21) or higher
+          - Internet connection
+          
+          ### 🔗 Backend
+          - Production: https://time-table-app-exrd.onrender.com
+          - Database: MongoDB Atlas
+        draft: false
+        prerelease: false
+    
+    - name: Upload Universal APK
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./flutter_app/build/app/outputs/flutter-apk/app-release.apk
+        asset_name: timetable-app-v${{ steps.version.outputs.VERSION }}-universal.apk
+        asset_content_type: application/vnd.android.package-archive
+    
+    - name: Upload ARM64 APK
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./flutter_app/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+        asset_name: timetable-app-v${{ steps.version.outputs.VERSION }}-arm64.apk
+        asset_content_type: application/vnd.android.package-archive
+    
+    - name: Upload ARMv7 APK
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./flutter_app/build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+        asset_name: timetable-app-v${{ steps.version.outputs.VERSION }}-armv7.apk
+        asset_content_type: application/vnd.android.package-archive
+    
+    - name: Upload x86_64 APK
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./flutter_app/build/app/outputs/flutter-apk/app-x86_64-release.apk
+        asset_name: timetable-app-v${{ steps.version.outputs.VERSION }}-x86_64.apk
+        asset_content_type: application/vnd.android.package-archive

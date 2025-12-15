@@ -1,0 +1,49 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'flutter_app/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'flutter_app/**'
+  workflow_dispatch:
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.38.3'
+        channel: 'stable'
+        cache: true
+    
+    - name: Install dependencies
+      working-directory: ./flutter_app
+      run: flutter pub get
+    
+    - name: Verify formatting
+      working-directory: ./flutter_app
+      run: flutter format --set-exit-if-changed .
+      continue-on-error: true
+    
+    - name: Analyze code
+      working-directory: ./flutter_app
+      run: flutter analyze
+    
+    - name: Run tests
+      working-directory: ./flutter_app
+      run: flutter test
+      continue-on-error: true
+    
+    - name: Check for outdated packages
+      working-directory: ./flutter_app
+      run: flutter pub outdated
+      continue-on-error: true

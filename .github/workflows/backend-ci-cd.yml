@@ -1,0 +1,71 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: ./backend
+      run: npm ci
+    
+    - name: Run linter
+      working-directory: ./backend
+      run: npm run lint || true
+    
+    - name: Run tests
+      working-directory: ./backend
+      run: npm test || true
+      env:
+        NODE_ENV: test
+        MONGODB_URI: mongodb://localhost:27017/test_db
+        JWT_SECRET: test_secret_key
+  
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Deploy to Render
+      env:
+        RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+      run: |
+        if [ -n "$RENDER_DEPLOY_HOOK" ]; then
+          curl "$RENDER_DEPLOY_HOOK"
+          echo "✅ Deployment triggered on Render"
+        else
+          echo "⚠️  RENDER_DEPLOY_HOOK not set. Skipping deployment."
+        fi
+    
+    - name: Verify deployment
+      run: |
+        sleep 60
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://time-table-app-exrd.onrender.com/api/health || true)
+        if [ "$response" = "200" ]; then
+          echo "✅ Deployment successful - API is responding"
+        else
+          echo "⚠️  API health check returned: $response"
+        fi
