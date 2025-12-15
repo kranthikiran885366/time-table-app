@@ -103,8 +103,6 @@ class NotificationService {
             ),
           ),
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
           payload: 'class_start_${classEntry.id}',
         );
       }
@@ -155,8 +153,6 @@ class NotificationService {
             ),
           ),
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
           payload: 'room_change_${nextClass.id}',
         );
       }

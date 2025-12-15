@@ -16,7 +16,7 @@ class ClassCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -32,14 +32,14 @@ class ClassCard extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: timetableEntry.classType == 'lab' ? Colors.orange : Colors.blue,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   timetableEntry.classType.toUpperCase(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -49,22 +49,22 @@ class ClassCard extends StatelessWidget {
             ],
           ),
           if (showCountdown) ...[
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             CountdownTimer(
               endTime: timetableEntry.endTime,
               startTime: timetableEntry.startTime,
               isCurrentClass: isCurrentClass,
             ),
           ],
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             timetableEntry.subject.name,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             'Faculty: ${timetableEntry.faculty.name}',
             style: TextStyle(
@@ -72,7 +72,7 @@ class ClassCard extends StatelessWidget {
               color: Colors.grey[600],
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             'Room: ${timetableEntry.room.number} (${timetableEntry.room.block})',
             style: TextStyle(
@@ -80,7 +80,7 @@ class ClassCard extends StatelessWidget {
               color: Colors.grey[600],
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             'Sections: ${timetableEntry.sections.map((s) => s.name).join(', ')}',
             style: TextStyle(
@@ -88,7 +88,7 @@ class ClassCard extends StatelessWidget {
               color: Colors.grey[600],
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             'Department: ${timetableEntry.subject.department}',
             style: TextStyle(

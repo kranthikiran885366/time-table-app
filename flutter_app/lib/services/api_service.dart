@@ -12,10 +12,10 @@ import '../models/analytics.dart';
 class ApiService {
   // Backend URL Configuration
   // For development (localhost):
-  static const String baseUrl = 'http://localhost:5000/api';
+  // static const String baseUrl = 'http://localhost:5000/api';
   
   // For production APK:
-  // static const String baseUrl = 'https://time-table-app-exrd.onrender.com/api';
+  static const String baseUrl = 'https://time-table-app-exrd.onrender.com/api';
   
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -31,19 +31,51 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> login(String email, String password) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email, 'password': password}),
-    );
+    try {
+      if (email.isEmpty || password.isEmpty) {
+        throw Exception('Email and password are required');
+      }
+      
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
+      ).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          throw Exception('Connection timeout. Please check your internet connection.');
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', data['token']);
-      return data;
-    } else {
-      throw Exception('Login failed');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['token'] == null || data['token'].toString().isEmpty) {
+          throw Exception('Invalid response: No token received');
+        }
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', data['token']);
+        return data;
+      } else if (response.statusCode == 401) {
+        throw Exception('Invalid email or password');
+      } else if (response.statusCode == 429) {
+        throw Exception('Too many login attempts. Please try again later.');
+      } else {
+        try {
+          final errorData = jsonDecode(response.body);
+          throw Exception(errorData['message'] ?? 'Login failed');
+        } catch (_) {
+          throw Exception('Login failed. Please try again.');
+        }
+      }
+    } on http.ClientException {
+      throw Exception('Network error: Please check your internet connection');
+    } on FormatException {
+      throw Exception('Server response error. Please try again.');
+    } catch (e) {
+      if (e.toString().contains('SocketException')) {
+        throw Exception('No internet connection. Please check your network.');
+      }
+      rethrow;
     }
   }
 
@@ -76,15 +108,34 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> searchBySection(String sectionId, String type) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/section/$sectionId/$type'),
-      headers: await getHeaders(),
-    );
+    try {
+      if (sectionId.isEmpty || type.isEmpty) {
+        throw Exception('Section ID and type are required');
+      }
+      
+      final response = await http.get(
+        Uri.parse('$baseUrl/section/$sectionId/$type'),
+        headers: await getHeaders(),
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw Exception('Request timed out');
+        },
+      );
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to search section');
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else if (response.statusCode == 404) {
+        throw Exception('Section not found');
+      } else if (response.statusCode == 401) {
+        throw Exception('Authentication required. Please login.');
+      } else {
+        throw Exception('Failed to search section (Status: ${response.statusCode})');
+      }
+    } on http.ClientException {
+      throw Exception('Network error: Cannot connect to server');
+    } catch (e) {
+      rethrow;
     }
   }
 
@@ -116,14 +167,26 @@ class ApiService {
   }
 
   static Future<UniversityConfig> getUniversityConfig() async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/university/config'),
-    );
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/university/config'),
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw Exception('Request timed out');
+        },
+      );
 
-    if (response.statusCode == 200) {
-      return UniversityConfig.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to load university config');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return UniversityConfig.fromJson(data);
+      } else {
+        throw Exception('Failed to load university config (Status: ${response.statusCode})');
+      }
+    } on http.ClientException {
+      throw Exception('Network error: Cannot connect to server');
+    } catch (e) {
+      rethrow;
     }
   }
 

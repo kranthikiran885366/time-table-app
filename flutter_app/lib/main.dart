@@ -16,13 +16,24 @@ import 'services/notification_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize notification service
-  await NotificationService().initialize();
+  // Global error handler
+  FlutterError.onError = (FlutterErrorDetails details) {
+    debugPrint('Flutter Error: ${details.exception}');
+  };
   
-  runApp(MyApp());
+  try {
+    // Initialize notification service with fallback
+    await NotificationService().initialize();
+  } catch (e) {
+    debugPrint('Failed to initialize notifications: $e');
+  }
+  
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -37,46 +48,57 @@ class MyApp extends StatelessWidget {
         ),
         home: LandingScreen(),
         debugShowCheckedModeBanner: false,
-        onGenerateRoute: (settings) {
-          if (settings.name == '/login') {
-            final userType = settings.arguments as String? ?? 'faculty';
+        onGenerateRoute: (RouteSettings settings) {
+          try {
+            switch (settings.name) {
+              case '/login':
+                final userType = settings.arguments as String? ?? 'faculty';
+                return MaterialPageRoute(
+                  builder: (context) => LoginScreen(userType: userType),
+                );
+              case '/upload-timetable':
+                return MaterialPageRoute(
+                  builder: (context) => const TimetableUploadScreen(),
+                );
+              case '/admin-dashboard':
+                return MaterialPageRoute(
+                  builder: (context) => const AdminDashboardScreen(),
+                );
+              case '/department-management':
+                return MaterialPageRoute(
+                  builder: (context) => const DepartmentManagementScreen(),
+                );
+              case '/announcement-management':
+                return MaterialPageRoute(
+                  builder: (context) => const AnnouncementManagementScreen(),
+                );
+              case '/activity-log':
+                return MaterialPageRoute(
+                  builder: (context) => const ActivityLogScreen(),
+                );
+              case '/analytics-dashboard':
+                return MaterialPageRoute(
+                  builder: (context) => AnalyticsDashboardScreen(),
+                );
+              case '/faculty-workload':
+                return MaterialPageRoute(
+                  builder: (context) => FacultyWorkloadScreen(),
+                );
+              case '/room-utilization':
+                return MaterialPageRoute(
+                  builder: (context) => RoomUtilizationScreen(),
+                );
+              default:
+                return MaterialPageRoute(
+                  builder: (context) => LandingScreen(),
+                );
+            }
+          } catch (e) {
+            debugPrint('Route generation error: $e');
             return MaterialPageRoute(
-              builder: (context) => LoginScreen(userType: userType),
-            );
-          } else if (settings.name == '/upload-timetable') {
-            return MaterialPageRoute(
-              builder: (context) => const TimetableUploadScreen(),
-            );
-          } else if (settings.name == '/admin-dashboard') {
-            return MaterialPageRoute(
-              builder: (context) => AdminDashboardScreen(),
-            );
-          } else if (settings.name == '/department-management') {
-            return MaterialPageRoute(
-              builder: (context) => const DepartmentManagementScreen(),
-            );
-          } else if (settings.name == '/announcement-management') {
-            return MaterialPageRoute(
-              builder: (context) => const AnnouncementManagementScreen(),
-            );
-          } else if (settings.name == '/activity-log') {
-            return MaterialPageRoute(
-              builder: (context) => const ActivityLogScreen(),
-            );
-          } else if (settings.name == '/analytics-dashboard') {
-            return MaterialPageRoute(
-              builder: (context) => AnalyticsDashboardScreen(),
-            );
-          } else if (settings.name == '/faculty-workload') {
-            return MaterialPageRoute(
-              builder: (context) => FacultyWorkloadScreen(),
-            );
-          } else if (settings.name == '/room-utilization') {
-            return MaterialPageRoute(
-              builder: (context) => RoomUtilizationScreen(),
+              builder: (context) => LandingScreen(),
             );
           }
-          return null;
         },
       ),
     );

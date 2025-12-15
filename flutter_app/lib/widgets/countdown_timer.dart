@@ -26,7 +26,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
   void initState() {
     super.initState();
     _calculateRemainingTime();
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _calculateRemainingTime();
     });
   }
@@ -93,7 +93,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
     final color = widget.isCurrentClass ? Colors.green : Colors.blue;
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
@@ -107,7 +107,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
             size: 16,
             color: color,
           ),
-          SizedBox(width: 6),
+          const SizedBox(width: 6),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,

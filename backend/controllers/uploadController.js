@@ -8,6 +8,28 @@ const Room = require('../models/Room');
 const Faculty = require('../models/Faculty');
 const XLSX = require('xlsx');
 const bcrypt = require('bcryptjs');
+const validator = require('validator');
+
+// Security: Limit XLSX parsing options to prevent prototype pollution
+const SAFE_XLSX_OPTIONS = {
+  cellDates: false,
+  cellNF: false,
+  cellStyles: false,
+  sheetStubs: false,
+  bookDeps: false,
+  bookFiles: false,
+  bookProps: false,
+  bookSheets: false,
+  bookVBA: false,
+  password: undefined,
+  WTF: false
+};
+
+// Input sanitization helper
+const sanitizeString = (input) => {
+  if (typeof input !== 'string') return input;
+  return validator.escape(input.trim());
+};
 
 /**
  * Upload and process Excel timetable file
@@ -24,7 +46,7 @@ exports.uploadTimetable = async (req, res) => {
       });
     }
 
-    // Validate file size (already handled by multer, but double-check)
+    // Enhanced file validation
     if (req.file.size === 0) {
       return res.status(400).json({
         success: false,
@@ -38,6 +60,25 @@ exports.uploadTimetable = async (req, res) => {
         success: false,
         message: 'File size exceeds 5MB limit',
         errorCode: 'FILE_TOO_LARGE'
+      });
+    }
+
+    // Security: Check for malicious file signatures
+    const fileHeader = req.file.buffer.slice(0, 4);
+    const validHeaders = [
+      Buffer.from([0x50, 0x4B, 0x03, 0x04]), // ZIP signature (XLSX)
+      Buffer.from([0xD0, 0xCF, 0x11, 0xE0])  // OLE signature (XLS)
+    ];
+    
+    const isValidHeader = validHeaders.some(header => 
+      fileHeader.equals(header.slice(0, fileHeader.length))
+    );
+    
+    if (!isValidHeader) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid file format detected',
+        errorCode: 'INVALID_FILE_SIGNATURE'
       });
     }
 
@@ -74,12 +115,13 @@ exports.uploadTimetable = async (req, res) => {
     console.log('📊 Processing Excel file:', req.file.originalname);
     console.log('📋 Mode:', mode, '| Dry Run:', dryRun);
 
-    // Step 1: Parse Excel file
+    // Step 1: Parse Excel file with security constraints
     console.log('📊 Parsing Excel file...');
     let parseResult;
     
     try {
-      parseResult = parseExcelFile(req.file.buffer);
+      // Security: Parse with limited options to prevent attacks
+      parseResult = parseExcelFile(req.file.buffer, SAFE_XLSX_OPTIONS);
     } catch (parseError) {
       console.error('❌ Fatal parsing error:', parseError);
       return res.status(400).json({
@@ -597,8 +639,12 @@ exports.downloadTemplate = async (req, res) => {
   try {
     const workbook = generateTemplate();
     
-    // Generate buffer
-    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    // Generate buffer with security options
+    const buffer = XLSX.write(workbook, { 
+      type: 'buffer', 
+      bookType: 'xlsx',
+      ...SAFE_XLSX_OPTIONS
+    });
     
     // Set headers for file download
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
