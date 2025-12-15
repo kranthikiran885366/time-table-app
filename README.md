@@ -2,12 +2,23 @@
 
 <div align="center">
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js](https://img.shields.io/badge/Node.js-16%2B-green)](https://nodejs.org/)
-[![Flutter](https://img.shields.io/badge/Flutter-3.0%2B-blue)](https://flutter.dev/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-5.0%2B-green)](https://www.mongodb.com/)
+![Flutter](https://img.shields.io/badge/Flutter-3.38.3-blue?logo=flutter)
+![Node.js](https://img.shields.io/badge/Node.js-20.x-green?logo=node.js)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?logo=mongodb)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Web-lightgrey)
+![Status](https://img.shields.io/badge/Status-Active-success)
 
-A comprehensive college timetable management system with Excel upload support, conflict detection, and real-time search functionality.
+![Flutter CI](https://github.com/kranthikiran885366/time-table-app/workflows/Flutter%20CI/badge.svg)
+![Backend CI/CD](https://github.com/kranthikiran885366/time-table-app/workflows/Backend%20CI%2FCD/badge.svg)
+
+![GitHub stars](https://img.shields.io/github/stars/kranthikiran885366/time-table-app?style=social)
+![GitHub forks](https://img.shields.io/github/forks/kranthikiran885366/time-table-app?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/kranthikiran885366/time-table-app?style=social)
+![GitHub last commit](https://img.shields.io/github/last-commit/kranthikiran885366/time-table-app)
+![GitHub repo size](https://img.shields.io/github/repo-size/kranthikiran885366/time-table-app)
+
+A comprehensive university timetable management system with Excel upload support, real-time notifications, and admin dashboard. Built with Flutter + Node.js + MongoDB.
 
 [Features](#features) • [Installation](#installation--setup) • [Documentation](#documentation) • [Contributing](#contributing) • [License](#license)
 
