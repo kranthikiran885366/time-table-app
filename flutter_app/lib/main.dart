@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
             );
           } else if (settings.name == '/analytics-dashboard') {
             return MaterialPageRoute(
-              builder: (context) => const AnalyticsDashboardScreen(),
+              builder: (context) => AnalyticsDashboardScreen(),
             );
           } else if (settings.name == '/faculty-workload') {
             return MaterialPageRoute(

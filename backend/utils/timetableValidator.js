@@ -279,7 +279,10 @@ async function checkFacultyConflicts(entries, entities) {
  * Comprehensive validation of timetable data
  */
 async function validateTimetableData(timetableEntries, options = {}) {
-  const { checkConflicts: shouldCheckConflicts = true } = options;
+  const { 
+    checkConflicts: shouldCheckConflicts = true,
+    skipEntityValidation = false 
+  } = options;
   
   const result = {
     valid: true,
@@ -288,24 +291,33 @@ async function validateTimetableData(timetableEntries, options = {}) {
     conflicts: [],
     summary: {
       totalEntries: timetableEntries.length,
-      validEntries: 0,
+      validEntries: timetableEntries.length,
       invalidEntries: 0
     }
   };
 
-  // Step 1: Validate entities exist
-  const entityValidation = await validateEntities(timetableEntries);
-  result.errors.push(...entityValidation.errors);
-  result.warnings.push(...entityValidation.warnings);
+  let entities = null;
 
-  if (!entityValidation.valid) {
-    result.valid = false;
-    return result;
+  // Step 1: Validate entities exist (skip for Excel uploads)
+  if (!skipEntityValidation) {
+    const entityValidation = await validateEntities(timetableEntries);
+    result.errors.push(...entityValidation.errors);
+    result.warnings.push(...entityValidation.warnings);
+    entities = entityValidation.entities;
+
+    if (!entityValidation.valid) {
+      result.valid = false;
+      result.summary.validEntries = 0;
+      result.summary.invalidEntries = timetableEntries.length;
+      return result;
+    }
+  } else {
+    console.log('⏭️  Skipping entity validation (Excel upload mode)');
   }
 
-  // Step 2: Detect conflicts
-  if (shouldCheckConflicts) {
-    const conflicts = await detectConflicts(timetableEntries, entityValidation.entities);
+  // Step 2: Detect conflicts (optional)
+  if (shouldCheckConflicts && !skipEntityValidation) {
+    const conflicts = await detectConflicts(timetableEntries, entities);
     result.conflicts = conflicts;
     
     // Count errors vs warnings
@@ -318,9 +330,6 @@ async function validateTimetableData(timetableEntries, options = {}) {
     const warningConflicts = conflicts.filter(c => c.severity === 'WARNING');
     result.warnings.push(...warningConflicts);
   }
-
-  result.summary.validEntries = result.valid ? timetableEntries.length : 0;
-  result.summary.invalidEntries = timetableEntries.length - result.summary.validEntries;
 
   return result;
 }

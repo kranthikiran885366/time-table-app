@@ -16,6 +16,7 @@ const departmentRoutes = require('./routes/department');
 const announcementRoutes = require('./routes/announcement');
 const activityLogRoutes = require('./routes/activityLog');
 const analyticsRoutes = require('./routes/analytics');
+const queryRoutes = require('./routes/query');
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use('/api/department', departmentRoutes);
 app.use('/api/announcement', announcementRoutes);
 app.use('/api/activity-log', activityLogRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/query', queryRoutes);
 app.use('/api', searchRoutes);
 
 // MongoDB Connection

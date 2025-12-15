@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/timetable_provider.dart';
 import '../models/timetable.dart';
+import '../models/section.dart';
 import '../widgets/class_card.dart';
 import '../services/notification_service.dart';
 

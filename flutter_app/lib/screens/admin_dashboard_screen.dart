@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../models/analytics.dart';
 import 'department_management_screen.dart';
+import 'section_management_screen.dart';
 import 'announcement_management_screen.dart';
 import 'activity_log_screen.dart';
 import 'analytics_dashboard_screen.dart';
@@ -170,7 +171,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       {'icon': Icons.school, 'label': 'Faculty', 'value': _stats!.overview.totalFaculty, 'color': Colors.blue, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => FacultyWorkloadScreen()))},
       {'icon': Icons.business, 'label': 'Departments', 'value': _stats!.overview.totalDepartments, 'color': Colors.green, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DepartmentManagementScreen()))},
       {'icon': Icons.meeting_room, 'label': 'Rooms', 'value': _stats!.overview.totalRooms, 'color': Colors.orange, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => RoomUtilizationScreen()))},
-      {'icon': Icons.class_, 'label': 'Sections', 'value': _stats!.overview.totalSections, 'color': Colors.purple, 'onTap': () => Navigator.pushNamed(context, '/upload-timetable')},
+      {'icon': Icons.class_, 'label': 'Sections', 'value': _stats!.overview.totalSections, 'color': Colors.purple, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SectionManagementScreen()))},
       {'icon': Icons.book, 'label': 'Subjects', 'value': _stats!.overview.totalSubjects, 'color': Colors.teal, 'onTap': () => Navigator.pushNamed(context, '/upload-timetable')},
       {'icon': Icons.calendar_today, 'label': 'Classes', 'value': _stats!.overview.totalClasses, 'color': Colors.indigo, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => AnalyticsDashboardScreen()))},
       {'icon': Icons.announcement, 'label': 'Announcements', 'value': _stats!.overview.activeAnnouncements, 'color': Colors.red, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AnnouncementManagementScreen()))},
@@ -224,6 +225,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget _buildQuickActions() {
     final actions = [
       {'icon': Icons.business, 'label': 'Departments', 'color': Colors.green, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DepartmentManagementScreen()))},
+      {'icon': Icons.class_, 'label': 'Sections', 'color': Colors.purple, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SectionManagementScreen()))},
       {'icon': Icons.announcement, 'label': 'Announcements', 'color': Colors.red, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AnnouncementManagementScreen()))},
       {'icon': Icons.history, 'label': 'Activity Logs', 'color': Colors.blue, 'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ActivityLogScreen()))},
       {'icon': Icons.upload_file, 'label': 'Upload Timetable', 'color': Colors.orange, 'onTap': () => Navigator.pushNamed(context, '/upload-timetable')},

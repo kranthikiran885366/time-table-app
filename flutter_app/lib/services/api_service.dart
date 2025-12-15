@@ -4,12 +4,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/timetable.dart';
 import '../models/university.dart';
 import '../models/department.dart';
+import '../models/section.dart';
 import '../models/announcement.dart';
 import '../models/activity_log.dart';
 import '../models/analytics.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://localhost:5000/api';
+  // Production URL - Update this with your deployed backend URL
+  static const String baseUrl = 'https://your-backend-url.com/api';
+  // For local testing: 'http://localhost:5000/api'
+  // For production: 'https://your-backend-url.com/api'
   
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -79,33 +83,6 @@ class ApiService {
       return jsonDecode(response.body);
     } else {
       throw Exception('Failed to search section');
-    }
-  }
-
-  static Future<List<Section>> getSections() async {
-    try {
-      final response = await http.get(
-        Uri.parse('\$baseUrl/section'),
-        headers: await getHeaders(),
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw Exception('Request timed out');
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        return data.map((json) => Section.fromJson(json)).toList();
-      } else if (response.statusCode == 401 || response.statusCode == 403) {
-        throw Exception('Authentication required. Please login.');
-      } else {
-        throw Exception('Failed to load sections (Status: \${response.statusCode})');
-      }
-    } on http.ClientException {
-      throw Exception('Network error: Cannot connect to server');
-    } catch (e) {
-      rethrow;
     }
   }
 
@@ -317,6 +294,63 @@ class ApiService {
     if (response.statusCode != 200) {
       final error = jsonDecode(response.body);
       throw Exception(error['message'] ?? 'Failed to delete department');
+    }
+  }
+
+  // ============ SECTION ENDPOINTS ============
+  
+  static Future<List<Section>> getSections() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/section'),
+      headers: await getHeaders(),
+    );
+    
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((json) => Section.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load sections');
+    }
+  }
+
+  static Future<Section> createSection(Map<String, dynamic> data) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/section'),
+      headers: await getHeaders(),
+      body: jsonEncode(data),
+    );
+    
+    if (response.statusCode == 201) {
+      return Section.fromJson(jsonDecode(response.body));
+    } else {
+      final error = jsonDecode(response.body);
+      throw Exception(error['message'] ?? 'Failed to create section');
+    }
+  }
+
+  static Future<Section> updateSection(String id, Map<String, dynamic> data) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/section/$id'),
+      headers: await getHeaders(),
+      body: jsonEncode(data),
+    );
+    
+    if (response.statusCode == 200) {
+      return Section.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to update section');
+    }
+  }
+
+  static Future<void> deleteSection(String id) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/section/$id'),
+      headers: await getHeaders(),
+    );
+    
+    if (response.statusCode != 200) {
+      final error = jsonDecode(response.body);
+      throw Exception(error['message'] ?? 'Failed to delete section');
     }
   }
 

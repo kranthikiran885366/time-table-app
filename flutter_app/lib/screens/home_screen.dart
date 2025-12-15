@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../models/timetable.dart';
+import '../models/section.dart';
 import 'room_details_screen.dart';
 import 'section_timetable_screen.dart';
 

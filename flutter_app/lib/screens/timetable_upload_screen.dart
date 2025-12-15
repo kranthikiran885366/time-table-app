@@ -221,10 +221,20 @@ class _TimetableUploadScreenState extends State<TimetableUploadScreen> {
         final hint = result['hint'] ?? '';
         final message = result['message'] ?? 'Upload failed';
         
-        _showErrorDialog(
-          'Upload Failed',
-          '$message\n\n${hint.isNotEmpty ? 'Hint: $hint' : ''}\n\nError Code: $errorCode',
-        );
+        // Handle missing sections error specially
+        if (errorCode == 'MISSING_SECTIONS') {
+          final missingSections = result['missingSections'] as List? ?? [];
+          final sectionList = missingSections.join(', ');
+          _showErrorDialog(
+            'Missing Sections',
+            'The following sections do not exist in the database:\n\n$sectionList\n\n${hint.isNotEmpty ? '$hint\n\n' : ''}Please create these sections in Section Management before uploading the timetable.',
+          );
+        } else {
+          _showErrorDialog(
+            'Upload Failed',
+            '$message\n\n${hint.isNotEmpty ? 'Hint: $hint' : ''}\n\nError Code: $errorCode',
+          );
+        }
       }
     } on Exception catch (e) {
       setState(() {

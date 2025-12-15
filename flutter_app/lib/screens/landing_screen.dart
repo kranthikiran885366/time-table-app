@@ -359,9 +359,9 @@ class _LandingScreenState extends State<LandingScreen>
       curve: Curves.easeOutBack,
       builder: (context, value, child) {
         return Transform.scale(
-          scale: value,
+          scale: value.clamp(0.0, 1.0),
           child: Opacity(
-            opacity: value,
+            opacity: value.clamp(0.0, 1.0),
             child: child,
           ),
         );

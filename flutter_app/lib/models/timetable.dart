@@ -56,17 +56,17 @@ class Room {
   }
 }
 
-class Section {
+class TimetableSection {
   final String id;
   final String name;
   final String department;
   final int year;
   final int semester;
 
-  Section({required this.id, required this.name, required this.department, required this.year, required this.semester});
+  TimetableSection({required this.id, required this.name, required this.department, required this.year, required this.semester});
 
-  factory Section.fromJson(Map<String, dynamic> json) {
-    return Section(
+  factory TimetableSection.fromJson(Map<String, dynamic> json) {
+    return TimetableSection(
       id: json['_id'],
       name: json['name'],
       department: json['department'],
@@ -84,7 +84,7 @@ class TimetableEntry {
   final Room room;
   final Faculty faculty;
   final Subject subject;
-  final List<Section> sections;
+  final List<TimetableSection> sections;
   final String classType;
   final String status;
 
@@ -110,7 +110,7 @@ class TimetableEntry {
       room: Room.fromJson(json['roomId']),
       faculty: Faculty.fromJson(json['facultyId']),
       subject: Subject.fromJson(json['subjectId']),
-      sections: (json['sectionIds'] as List).map((s) => Section.fromJson(s)).toList(),
+      sections: (json['sections'] as List).map((s) => TimetableSection.fromJson(s)).toList(),
       classType: json['classType'],
       status: json['status'],
     );
