@@ -10,10 +10,12 @@ import '../models/activity_log.dart';
 import '../models/analytics.dart';
 
 class ApiService {
-  // Production URL - Update this with your deployed backend URL
-  static const String baseUrl = 'https://your-backend-url.com/api';
-  // For local testing: 'http://localhost:5000/api'
-  // For production: 'https://your-backend-url.com/api'
+  // Backend URL Configuration
+  // For development (localhost):
+  // static const String baseUrl = 'http://localhost:5000/api';
+  
+  // For production APK:
+  static const String baseUrl = 'https://time-table-app-exrd.onrender.com/api';
   
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -48,7 +50,7 @@ class ApiService {
   static Future<Map<String, dynamic>> searchByRoom(String roomNo) async {
     try {
       final response = await http.get(
-        Uri.parse('\$baseUrl/room/\$roomNo/current'),
+        Uri.parse('$baseUrl/room/$roomNo/current'),
         headers: await getHeaders(),
       ).timeout(
         const Duration(seconds: 10),
@@ -64,7 +66,7 @@ class ApiService {
       } else if (response.statusCode == 401) {
         throw Exception('Authentication required. Please login.');
       } else {
-        throw Exception('Failed to search room (Status: \${response.statusCode})');
+        throw Exception('Failed to search room (Status: ${response.statusCode})');
       }
     } on http.ClientException {
       throw Exception('Network error: Cannot connect to server');
@@ -89,7 +91,7 @@ class ApiService {
   static Future<List<Room>> getRooms() async {
     try {
       final response = await http.get(
-        Uri.parse('\$baseUrl/room'),
+        Uri.parse('$baseUrl/room'),
         headers: await getHeaders(),
       ).timeout(
         const Duration(seconds: 10),
@@ -104,7 +106,7 @@ class ApiService {
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         throw Exception('Authentication required. Please login.');
       } else {
-        throw Exception('Failed to load rooms (Status: \${response.statusCode})');
+        throw Exception('Failed to load rooms (Status: ${response.statusCode})');
       }
     } on http.ClientException {
       throw Exception('Network error: Cannot connect to server');

@@ -548,7 +548,9 @@ class _SectionManagementScreenState extends State<SectionManagementScreen> {
                                       ? Colors.green 
                                       : Colors.grey,
                                   child: Text(
-                                    section.sectionCode.substring(0, 1),
+                                    section.sectionCode.isNotEmpty 
+                                        ? section.sectionCode.substring(0, 1)
+                                        : '?',
                                     style: const TextStyle(color: Colors.white),
                                   ),
                                 ),

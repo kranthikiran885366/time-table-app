@@ -7,19 +7,43 @@ const searchByRoom = async (req, res) => {
     const currentDay = getCurrentDay();
     const Room = require('../models/Room');
     
-    // Find room details
+    // Find room details (optional - may not exist for dynamically created rooms)
     const room = await Room.findOne({ number: roomNo });
-    if (!room) {
-      return res.status(404).json({ message: 'Room not found' });
-    }
     
-    // Get all timetable for the room
-    const allTimetable = await Timetable.find({ roomId: room._id })
+    // Get all timetable for the room (search by roomNo string)
+    const allTimetable = await Timetable.find({ roomNo: roomNo })
       .populate('roomId')
       .populate('facultyId')
       .populate('subjectId')
-      .populate('sectionIds')
+      .populate('sectionId')
       .sort({ day: 1, startTime: 1 });
+    
+    // If no timetable found, return empty result
+    if (allTimetable.length === 0) {
+      return res.json({
+        room: room ? {
+          number: room.number,
+          block: room.block,
+          capacity: room.capacity,
+          type: room.type
+        } : {
+          number: roomNo,
+          block: 'Unknown',
+          capacity: 60,
+          type: 'classroom'
+        },
+        currentClass: null,
+        nextClass: null,
+        todayClasses: [],
+        weeklySchedule: [],
+        analytics: {
+          utilization: {},
+          freeSlots: [],
+          totalClassesToday: 0,
+          peakUsageDay: null
+        }
+      });
+    }
     
     // Today's classes
     const todayClasses = allTimetable.filter(item => item.day === currentDay);
@@ -74,11 +98,16 @@ const searchByRoom = async (req, res) => {
     });
     
     res.json({
-      room: {
+      room: room ? {
         number: room.number,
         block: room.block,
         capacity: room.capacity,
         type: room.type
+      } : {
+        number: roomNo,
+        block: 'Unknown',
+        capacity: 60,
+        type: 'classroom'
       },
       currentClass,
       nextClass,
@@ -105,13 +134,17 @@ const searchBySection = async (req, res) => {
     const Section = require('../models/Section');
     const Subject = require('../models/Subject');
     
-    // Get section details
-    const section = await Section.findById(sectionId);
+    // Get section details - try both by ID and by sectionCode
+    let section = await Section.findById(sectionId);
+    if (!section) {
+      // Try finding by sectionCode if not found by ID
+      section = await Section.findOne({ sectionCode: sectionId.toUpperCase() });
+    }
     if (!section) {
       return res.status(404).json({ message: 'Section not found' });
     }
     
-    let query = { sectionIds: sectionId };
+    let query = { sectionCode: section.sectionCode };
     
     if (type === 'today') {
       query.day = getCurrentDay();
@@ -121,7 +154,7 @@ const searchBySection = async (req, res) => {
       .populate('roomId')
       .populate('facultyId')
       .populate('subjectId')
-      .populate('sectionIds')
+      .populate('sectionId')
       .sort({ day: 1, startTime: 1 });
     
     const currentClass = timetable.find(item => 
@@ -138,8 +171,8 @@ const searchBySection = async (req, res) => {
       const faculties = {};
       
       dayClasses.forEach(cls => {
-        const subName = cls.subjectId.name;
-        const facName = cls.facultyId.name;
+        const subName = cls.subjectId?.name || cls.subjectCode;
+        const facName = cls.facultyId?.name || cls.facultyName || 'TBA';
         subjects[subName] = (subjects[subName] || 0) + 1;
         faculties[facName] = (faculties[facName] || 0) + 1;
       });
@@ -156,14 +189,14 @@ const searchBySection = async (req, res) => {
     // Subject-wise distribution
     const subjectDistribution = {};
     timetable.forEach(cls => {
-      const subName = cls.subjectId.name;
-      const subCode = cls.subjectId.code;
+      const subName = cls.subjectId?.name || cls.subjectCode;
+      const subCode = cls.subjectId?.code || cls.subjectCode;
       if (!subjectDistribution[subName]) {
         subjectDistribution[subName] = {
           code: subCode,
           count: 0,
           hours: 0,
-          faculty: cls.facultyId.name,
+          faculty: cls.facultyId?.name || cls.facultyName || 'TBA',
           type: cls.classType
         };
       }

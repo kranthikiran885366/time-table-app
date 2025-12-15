@@ -25,7 +25,7 @@ class _SectionTimetableScreenState extends State<SectionTimetableScreen>
     _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final provider = Provider.of<TimetableProvider>(context, listen: false);
-      await provider.searchBySection(widget.section.id, 'today');
+      await provider.searchBySection(widget.section.id ?? '', 'today');
       
       // Schedule notifications for today's classes
       if (provider.timetable.isNotEmpty) {
@@ -49,7 +49,7 @@ class _SectionTimetableScreenState extends State<SectionTimetableScreen>
           onTap: (index) {
             final type = index == 0 ? 'today' : 'weekly';
             Provider.of<TimetableProvider>(context, listen: false)
-                .searchBySection(widget.section.id, type);
+                .searchBySection(widget.section.id ?? '', type);
           },
         ),
       ),

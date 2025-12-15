@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId = "com.college.timetable_management"
-        minSdk = 21
+        minSdk = flutter.minSdkVersion
         targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName

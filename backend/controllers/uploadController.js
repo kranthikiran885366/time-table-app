@@ -5,7 +5,9 @@ const Timetable = require('../models/Timetable');
 const Section = require('../models/Section');
 const Subject = require('../models/Subject');
 const Room = require('../models/Room');
+const Faculty = require('../models/Faculty');
 const XLSX = require('xlsx');
+const bcrypt = require('bcryptjs');
 
 /**
  * Upload and process Excel timetable file
@@ -109,38 +111,7 @@ exports.uploadTimetable = async (req, res) => {
 
     console.log('✅ Parsed', parseResult.summary.totalEntries, 'entries from', parseResult.summary.processedSheets, 'sheets');
 
-    // Step 2: ENTERPRISE VALIDATION - Check all sections exist in database
-    console.log('🔍 Validating sections against database...');
-    
-    const excelSections = parseResult.sections.map(s => s.sectionName.toUpperCase());
-    const dbSections = await Section.find({
-      sectionCode: { $in: excelSections }
-    }).select('sectionCode name');
-    
-    const dbSectionSet = new Set(dbSections.map(s => s.sectionCode));
-    const missingSections = excelSections.filter(sec => !dbSectionSet.has(sec));
-
-    // STRICT RULE: If ANY section is missing, fail the entire upload
-    if (missingSections.length > 0) {
-      console.error('❌ Section validation failed:', missingSections.length, 'missing');
-      return res.status(400).json({
-        success: false,
-        message: 'Section master mismatch. Please create missing sections first.',
-        errorCode: 'MISSING_SECTIONS',
-        missingSections: missingSections,
-        summary: {
-          totalSheets: parseResult.summary.processedSheets,
-          foundSections: excelSections.length,
-          existingSections: dbSections.length,
-          missingSections: missingSections.length
-        },
-        hint: 'Go to Section Management and create these sections before uploading timetable'
-      });
-    }
-
-    console.log(`✅ All ${excelSections.length} sections validated successfully`);
-
-    // Step 3: Flatten all timetable entries
+    // Step 2: Flatten all timetable entries first
     const allEntries = [];
     const sectionResults = [];
 
@@ -153,6 +124,17 @@ exports.uploadTimetable = async (req, res) => {
         parseErrors: sectionData.errors
       });
     }
+
+    // Step 3: DYNAMIC ENTITY CREATION - Auto-create missing sections, subjects, rooms, faculty
+    console.log('🔍 Creating missing database entities from Excel...');
+    
+    const creationStats = await createMissingEntities(parseResult.sections, allEntries);
+    
+    console.log(`✅ Database entities ready:`);
+    console.log(`   - Sections: ${creationStats.sections.created} created, ${creationStats.sections.existing} existing`);
+    console.log(`   - Subjects: ${creationStats.subjects.created} created, ${creationStats.subjects.existing} existing`);
+    console.log(`   - Rooms: ${creationStats.rooms.created} created, ${creationStats.rooms.existing} existing`);
+    console.log(`   - Faculty: ${creationStats.faculty.created} created, ${creationStats.faculty.existing} existing`);
 
     // Step 4: Validate timetable data (skip subject/room validation, sections already checked)
     console.log('🔍 Validating timetable data...');
@@ -175,6 +157,7 @@ exports.uploadTimetable = async (req, res) => {
         conflicts: validation.conflicts.length
       },
       sections: sectionResults,
+      created: creationStats, // Show what was auto-created
       errors: [],
       warnings: validation.warnings,
       conflicts: validation.conflicts
@@ -196,7 +179,8 @@ exports.uploadTimetable = async (req, res) => {
     return res.status(200).json({
       ...responseData,
       message: 'Timetable uploaded and saved successfully',
-      saved: saveResult
+      saved: saveResult,
+      autoCreated: creationStats
     });
 
   } catch (error) {
@@ -315,48 +299,52 @@ async function saveTimetableToDatabase(entries, mode) {
           // Just use what's in the Excel file directly
           console.log(`📝 Processing ${sectionEntries.length} entries for ${sectionCode} (Excel-only mode)`);
 
-          // Optional: Find existing subjects/rooms for reference linking (but don't require them)
+          // Find all entities (should exist now after dynamic creation)
           const subjectCodes = [...new Set(sectionEntries.map(e => e.subjectCode))];
           const roomNumbers = [...new Set(sectionEntries.map(e => e.roomNo).filter(Boolean))];
+          const facultyNames = [...new Set(sectionEntries.map(e => e.faculty).filter(Boolean))];
 
           let subjectMap = new Map();
           let roomMap = new Map();
+          let facultyMap = new Map();
 
           try {
-            // Try to find existing subjects/rooms, but don't fail if not found
+            // Find subjects, rooms, and faculty (should all exist now)
             const subjects = await Subject.find({ code: { $in: subjectCodes } }).session(session);
             subjectMap = new Map(subjects.map(s => [s.code, s._id]));
             
-            const rooms = await Room.find({ roomNo: { $in: roomNumbers } }).session(session);
-            roomMap = new Map(rooms.map(r => [r.roomNo, r._id]));
+            const rooms = await Room.find({ number: { $in: roomNumbers } }).session(session);
+            roomMap = new Map(rooms.map(r => [r.number, r._id]));
+            
+            const faculty = await Faculty.find({ name: { $in: facultyNames } }).session(session);
+            facultyMap = new Map(faculty.map(f => [f.name, f._id]));
 
-            if (subjects.length > 0) {
-              console.log(`   ✓ Linked ${subjects.length}/${subjectCodes.length} subjects from DB`);
-            }
-            if (rooms.length > 0) {
-              console.log(`   ✓ Linked ${rooms.length}/${roomNumbers.length} rooms from DB`);
-            }
+            console.log(`   ✓ Linked ${subjects.length}/${subjectCodes.length} subjects`);
+            console.log(`   ✓ Linked ${rooms.length}/${roomNumbers.length} rooms`);
+            console.log(`   ✓ Linked ${faculty.length}/${facultyNames.length} faculty`);
           } catch (linkError) {
-            console.warn(`   ⚠️  Could not link subjects/rooms: ${linkError.message}`);
+            console.warn(`   ⚠️  Could not link entities: ${linkError.message}`);
           }
 
           // Step 4: Prepare timetable documents - Excel data is source of truth
           const timetableDocs = [];
 
           for (const entry of sectionEntries) {
-            // Optional linking to existing entities (if found)
+            // Link to entities (should exist after dynamic creation)
             const subjectId = subjectMap.get(entry.subjectCode) || null;
             const roomId = entry.roomNo ? roomMap.get(entry.roomNo) : null;
+            const facultyId = entry.faculty ? facultyMap.get(entry.faculty) : null;
 
-            // Create timetable entry - all data comes from Excel
+            // Create timetable entry with full linking
             timetableDocs.push({
               sectionCode: sectionCode.toUpperCase(),
               sectionId: sectionDoc._id,
-              subjectCode: entry.subjectCode, // Required - from Excel
-              subjectId: subjectId, // Optional - link if exists
-              roomNo: entry.roomNo || 'TBA', // Required - from Excel or TBA
-              roomId: roomId, // Optional - link if exists
-              facultyName: entry.faculty || null, // Optional - from Excel
+              subjectCode: entry.subjectCode,
+              subjectId: subjectId,
+              roomNo: entry.roomNo || 'TBA',
+              roomId: roomId,
+              facultyName: entry.faculty || 'TBA',
+              facultyId: facultyId,
               day: entry.day,
               startTime: entry.startTime,
               endTime: entry.endTime,
@@ -433,6 +421,172 @@ async function saveTimetableToDatabase(entries, mode) {
   }
 
   return result;
+}
+
+/**
+ * Auto-create missing database entities from Excel data
+ */
+async function createMissingEntities(sections, allEntries) {
+  const stats = {
+    sections: { created: 0, existing: 0 },
+    subjects: { created: 0, existing: 0 },
+    rooms: { created: 0, existing: 0 },
+    faculty: { created: 0, existing: 0 }
+  };
+
+  try {
+    // 1. Create missing sections
+    const sectionCodes = [...new Set(sections.map(s => s.sectionName.toUpperCase()))];
+    const existingSections = await Section.find({ sectionCode: { $in: sectionCodes } });
+    const existingSectionCodes = new Set(existingSections.map(s => s.sectionCode));
+    
+    const missingSectionCodes = sectionCodes.filter(code => !existingSectionCodes.has(code));
+    
+    if (missingSectionCodes.length > 0) {
+      const newSections = missingSectionCodes.map(code => ({
+        sectionCode: code,
+        name: `Section ${code}`,
+        department: 'Computer Science', // Default department
+        year: 3,
+        semester: 5,
+        strength: 60,
+        academicYear: '2024-25',
+        isActive: true
+      }));
+      
+      await Section.insertMany(newSections);
+      stats.sections.created = newSections.length;
+    }
+    stats.sections.existing = existingSections.length;
+
+    // 2. Create missing subjects
+    const subjectCodes = [...new Set(allEntries.map(e => e.subjectCode).filter(Boolean))];
+    const existingSubjects = await Subject.find({ code: { $in: subjectCodes } });
+    const existingSubjectCodes = new Set(existingSubjects.map(s => s.code));
+    
+    const missingSubjectCodes = subjectCodes.filter(code => !existingSubjectCodes.has(code));
+    
+    if (missingSubjectCodes.length > 0) {
+      const newSubjects = missingSubjectCodes.map(code => ({
+        code: code,
+        name: getSubjectName(code), // Helper function to generate name
+        department: 'Computer Science',
+        semester: 5,
+        credits: code.includes('LAB') ? 2 : 3
+      }));
+      
+      await Subject.insertMany(newSubjects);
+      stats.subjects.created = newSubjects.length;
+    }
+    stats.subjects.existing = existingSubjects.length;
+
+    // 3. Create missing rooms
+    const roomNumbers = [...new Set(allEntries.map(e => e.roomNo).filter(Boolean))];
+    const existingRooms = await Room.find({ number: { $in: roomNumbers } });
+    const existingRoomNumbers = new Set(existingRooms.map(r => r.number));
+    
+    const missingRoomNumbers = roomNumbers.filter(num => !existingRoomNumbers.has(num));
+    
+    if (missingRoomNumbers.length > 0) {
+      const newRooms = missingRoomNumbers.map(number => ({
+        number: number,
+        block: getBlockFromRoom(number), // Helper function
+        capacity: number.includes('LAB') || number > '500' ? 30 : 60,
+        type: number.includes('LAB') || number > '500' ? 'lab' : 'classroom'
+      }));
+      
+      await Room.insertMany(newRooms);
+      stats.rooms.created = newRooms.length;
+    }
+    stats.rooms.existing = existingRooms.length;
+
+    // 4. Create missing faculty (from faculty names in entries)
+    const facultyNames = [...new Set(allEntries.map(e => e.faculty).filter(Boolean))];
+    const existingFaculty = await Faculty.find({ name: { $in: facultyNames } });
+    const existingFacultyNames = new Set(existingFaculty.map(f => f.name));
+    
+    const missingFacultyNames = facultyNames.filter(name => !existingFacultyNames.has(name));
+    
+    if (missingFacultyNames.length > 0) {
+      const newFaculty = [];
+      
+      for (const name of missingFacultyNames) {
+        const email = generateFacultyEmail(name);
+        const hashedPassword = await bcrypt.hash('faculty123', 10);
+        
+        newFaculty.push({
+          name: name,
+          department: 'Computer Science',
+          email: email,
+          password: hashedPassword,
+          role: 'faculty'
+        });
+      }
+      
+      await Faculty.insertMany(newFaculty);
+      stats.faculty.created = newFaculty.length;
+    }
+    stats.faculty.existing = existingFaculty.length;
+
+  } catch (error) {
+    console.error('Error creating entities:', error);
+    throw error;
+  }
+
+  return stats;
+}
+
+/**
+ * Helper function to generate subject name from code
+ */
+function getSubjectName(code) {
+  const subjectMap = {
+    'CD': 'Compiler Design',
+    'DMT': 'Data Mining Techniques',
+    'CN': 'Computer Networks',
+    'ADS': 'Advanced Data Structures',
+    'AJP': 'Advanced Java Programming',
+    'SS': 'System Software',
+    'IAI': 'Introduction to Artificial Intelligence',
+    'IDP': 'Innovative Design Project',
+    'DIP': 'Digital Image Processing',
+    'AI': 'Artificial Intelligence'
+  };
+  
+  const baseCode = code.replace('-LAB', '').replace('-T', '');
+  const baseName = subjectMap[baseCode] || `Subject ${baseCode}`;
+  
+  if (code.includes('LAB')) {
+    return `${baseName} Lab`;
+  }
+  return baseName;
+}
+
+/**
+ * Helper function to determine block from room number
+ */
+function getBlockFromRoom(roomNumber) {
+  if (roomNumber.startsWith('1') || roomNumber.startsWith('2')) return 'A';
+  if (roomNumber.startsWith('3') || roomNumber.startsWith('4')) return 'B';
+  if (roomNumber.startsWith('5') || roomNumber.startsWith('6')) return 'C';
+  return 'D';
+}
+
+/**
+ * Helper function to generate faculty email from name
+ */
+function generateFacultyEmail(name) {
+  // Convert "Ms. V. ANUSHA" to "v.anusha@college.edu"
+  const cleanName = name.replace(/^(Mr\.|Ms\.|Dr\.|Prof\.?)\s*/i, '');
+  const parts = cleanName.toLowerCase().split(/\s+/);
+  
+  if (parts.length >= 2) {
+    const firstName = parts[0].charAt(0);
+    const lastName = parts[parts.length - 1];
+    return `${firstName}.${lastName}@college.edu`;
+  }
+  
+  return `${cleanName.toLowerCase().replace(/\s+/g, '.')}@college.edu`;
 }
 
 /**
