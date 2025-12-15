@@ -1,0 +1,11 @@
+<!-- University Logo Placeholder SVG -->
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="100" r="95" fill="#7B68B3"/>
+  <path d="M 50 100 L 100 20 L 150 100 Z" fill="#1E5BA8" stroke="white" stroke-width="8"/>
+  <path d="M 100 100 L 100 180" fill="none" stroke="#1E5BA8" stroke-width="20"/>
+  <path d="M 20 100 L 100 100 L 180 100" fill="none" stroke="#1E5BA8" stroke-width="20"/>
+  <path d="M 35 60 L 100 100 L 165 60" fill="none" stroke="#1E5BA8" stroke-width="15"/>
+  <path d="M 35 140 L 100 100 L 165 140" fill="none" stroke="#1E5BA8" stroke-width="15"/>
+  <circle cx="100" cy="100" r="25" fill="#1E5BA8" stroke="white" stroke-width="5"/>
+  <polygon points="100,90 95,105 105,100 95,100 100,110 105,100" fill="white"/>
+</svg>
