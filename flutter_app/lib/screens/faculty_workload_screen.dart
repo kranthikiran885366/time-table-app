@@ -119,7 +119,7 @@ class _FacultyWorkloadScreenState extends State<FacultyWorkloadScreen> {
                                 child: Column(
                                   children: [
                                     _buildInfoRow('Total Classes', faculty.totalClasses.toString()),
-                                    _buildInfoRow('Weekly Hours', faculty.weeklyHours),
+                                    _buildInfoRow('Weekly Hours', faculty.weeklyHours.toString()),
                                     _buildInfoRow('Utilization', '${faculty.utilizationPercent}%'),
                                     _buildInfoRow('On Leave', faculty.onLeave ? 'Yes' : 'No'),
                                   ],

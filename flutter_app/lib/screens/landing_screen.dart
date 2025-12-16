@@ -230,7 +230,7 @@ class _LandingScreenState extends State<LandingScreen>
                               curve: Curves.easeOut,
                               builder: (context, value, child) {
                                 return Opacity(
-                                  opacity: value,
+                                  opacity: value.clamp(0.0, 1.0),
                                   child: Transform.translate(
                                     offset: Offset(0, 20 * (1 - value)),
                                     child: child,
@@ -285,7 +285,7 @@ class _LandingScreenState extends State<LandingScreen>
                     curve: Curves.easeOut,
                     builder: (context, value, child) {
                       return Opacity(
-                        opacity: value,
+                        opacity: value.clamp(0.0, 1.0),
                         child: Transform.translate(
                           offset: Offset(0, 20 * (1 - value)),
                           child: child,
@@ -383,7 +383,7 @@ class _LandingScreenState extends State<LandingScreen>
       curve: Curves.easeOutBack,
       builder: (context, value, child) {
         return Transform.scale(
-          scale: value.clamp(0.0, 1.0),
+          scale: value.clamp(0.1, 1.0),
           child: Opacity(
             opacity: value.clamp(0.0, 1.0),
             child: child,
@@ -493,9 +493,9 @@ class _LandingScreenState extends State<LandingScreen>
       curve: Curves.elasticOut,
       builder: (context, value, child) {
         return Transform.scale(
-          scale: value,
+          scale: value.clamp(0.1, 1.0),
           child: Opacity(
-            opacity: value,
+            opacity: value.clamp(0.0, 1.0),
             child: child,
           ),
         );

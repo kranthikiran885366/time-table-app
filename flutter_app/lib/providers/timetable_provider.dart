@@ -31,7 +31,7 @@ class TimetableProvider with ChangeNotifier {
           ? TimetableEntry.fromJson(data['nextClass']) 
           : null;
       
-      _timetable = (data['todayClasses'] as List)
+      _timetable = (data['todayClasses'] as List? ?? [])
           .map((json) => TimetableEntry.fromJson(json))
           .toList();
       

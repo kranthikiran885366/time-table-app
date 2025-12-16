@@ -13,26 +13,13 @@ import 'screens/faculty_workload_screen.dart';
 import 'screens/room_utilization_screen.dart';
 import 'services/notification_service.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Global error handler
   FlutterError.onError = (FlutterErrorDetails details) {
     debugPrint('Flutter Error: ${details.exception}');
   };
-  
-  // Initialize notification service with complete error handling
-  try {
-    await NotificationService().initialize().timeout(
-      const Duration(seconds: 3),
-      onTimeout: () {
-        debugPrint('Notification initialization timed out');
-      },
-    );
-  } catch (e) {
-    debugPrint('Failed to initialize notifications: $e');
-    // Continue without notifications
-  }
   
   runApp(const MyApp());
 }
@@ -44,7 +31,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => TimetableProvider()),
+        ChangeNotifierProvider(
+          create: (_) => TimetableProvider(),
+          lazy: false,
+        ),
       ],
       child: MaterialApp(
         title: 'Timetable Management System',
@@ -52,7 +42,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: LandingScreen(),
+        home: const SafeArea(child: LandingScreen()),
         debugShowCheckedModeBanner: false,
         onGenerateRoute: (RouteSettings settings) {
           try {

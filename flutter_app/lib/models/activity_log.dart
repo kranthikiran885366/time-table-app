@@ -1,49 +1,49 @@
 class ActivityLog {
   final String id;
   final String userId;
-  final String userName;
-  final String userRole;
   final String action;
   final String entity;
-  final String? entityId;
+  final String details;
   final String description;
+  final String userName;
+  final String userRole;
   final String ipAddress;
   final String device;
   final String browser;
-  final String status;
+  final DateTime timestamp;
   final DateTime createdAt;
 
   ActivityLog({
     required this.id,
     required this.userId,
-    required this.userName,
-    required this.userRole,
     required this.action,
     required this.entity,
-    this.entityId,
+    required this.details,
     required this.description,
-    this.ipAddress = '',
-    this.device = '',
-    this.browser = '',
-    this.status = 'success',
+    required this.userName,
+    required this.userRole,
+    required this.ipAddress,
+    required this.device,
+    required this.browser,
+    required this.timestamp,
     required this.createdAt,
   });
 
   factory ActivityLog.fromJson(Map<String, dynamic> json) {
     return ActivityLog(
-      id: json['_id'],
-      userId: json['userId']?['_id'] ?? json['userId'] ?? '',
-      userName: json['userName'] ?? '',
-      userRole: json['userRole'] ?? '',
-      action: json['action'],
-      entity: json['entity'],
-      entityId: json['entityId'],
-      description: json['description'],
+      id: json['_id'] ?? '',
+      userId: json['userId'] ?? '',
+      action: json['action'] ?? '',
+      entity: json['entity'] ?? '',
+      details: json['details'] ?? '',
+      description: json['description'] ?? json['details'] ?? '',
+      userName: json['userName'] ?? 'Unknown',
+      userRole: json['userRole'] ?? 'user',
       ipAddress: json['ipAddress'] ?? '',
-      device: json['device'] ?? '',
-      browser: json['browser'] ?? '',
-      status: json['status'] ?? 'success',
-      createdAt: DateTime.parse(json['createdAt']),
+      device: json['device'] ?? 'Unknown',
+      browser: json['browser'] ?? 'Unknown',
+      timestamp: DateTime.tryParse(json['timestamp'] ?? '') ?? DateTime.now(),
+      createdAt: DateTime.tryParse(json['createdAt'] ?? json['timestamp'] ?? '') ?? DateTime.now(),
     );
   }
 }

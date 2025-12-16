@@ -13,10 +13,10 @@ class UniversityConfig {
 
   factory UniversityConfig.fromJson(Map<String, dynamic> json) {
     return UniversityConfig(
-      name: json['name'],
-      tagline: json['tagline'],
-      logoUrl: json['logoUrl'],
-      primaryColor: json['primaryColor'],
+      name: json['name'] ?? 'Timetable Management',
+      tagline: json['tagline'] ?? 'Manage your schedule efficiently',
+      logoUrl: json['logoUrl'] ?? '',
+      primaryColor: json['primaryColor'] ?? '#673AB7',
     );
   }
 }

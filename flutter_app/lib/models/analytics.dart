@@ -1,21 +1,33 @@
 class DashboardStats {
-  final OverviewStats overview;
+  final int totalFaculty;
+  final int totalSubjects;
+  final int totalRooms;
+  final int totalSections;
+  final Overview overview;
   final SystemHealth systemHealth;
 
   DashboardStats({
+    required this.totalFaculty,
+    required this.totalSubjects,
+    required this.totalRooms,
+    required this.totalSections,
     required this.overview,
     required this.systemHealth,
   });
 
   factory DashboardStats.fromJson(Map<String, dynamic> json) {
     return DashboardStats(
-      overview: OverviewStats.fromJson(json['overview']),
-      systemHealth: SystemHealth.fromJson(json['systemHealth']),
+      totalFaculty: json['totalFaculty'] ?? 0,
+      totalSubjects: json['totalSubjects'] ?? 0,
+      totalRooms: json['totalRooms'] ?? 0,
+      totalSections: json['totalSections'] ?? 0,
+      overview: Overview.fromJson(json['overview'] ?? {}),
+      systemHealth: SystemHealth.fromJson(json['systemHealth'] ?? {}),
     );
   }
 }
 
-class OverviewStats {
+class Overview {
   final int totalFaculty;
   final int totalDepartments;
   final int totalRooms;
@@ -24,7 +36,7 @@ class OverviewStats {
   final int totalClasses;
   final int activeAnnouncements;
 
-  OverviewStats({
+  Overview({
     required this.totalFaculty,
     required this.totalDepartments,
     required this.totalRooms,
@@ -34,8 +46,8 @@ class OverviewStats {
     required this.activeAnnouncements,
   });
 
-  factory OverviewStats.fromJson(Map<String, dynamic> json) {
-    return OverviewStats(
+  factory Overview.fromJson(Map<String, dynamic> json) {
+    return Overview(
       totalFaculty: json['totalFaculty'] ?? 0,
       totalDepartments: json['totalDepartments'] ?? 0,
       totalRooms: json['totalRooms'] ?? 0,
@@ -48,88 +60,95 @@ class OverviewStats {
 }
 
 class SystemHealth {
-  final String databaseStatus;
   final String apiStatus;
 
-  SystemHealth({
-    required this.databaseStatus,
-    required this.apiStatus,
-  });
+  SystemHealth({required this.apiStatus});
 
   factory SystemHealth.fromJson(Map<String, dynamic> json) {
     return SystemHealth(
-      databaseStatus: json['databaseStatus'] ?? 'unknown',
-      apiStatus: json['apiStatus'] ?? 'unknown',
-    );
-  }
-}
-
-class FacultyWorkload {
-  final String id;
-  final String name;
-  final String department;
-  final int totalClasses;
-  final String weeklyHours;
-  final int maxWeeklyHours;
-  final String utilizationPercent;
-  final String loadStatus;
-  final bool onLeave;
-
-  FacultyWorkload({
-    required this.id,
-    required this.name,
-    required this.department,
-    required this.totalClasses,
-    required this.weeklyHours,
-    required this.maxWeeklyHours,
-    required this.utilizationPercent,
-    required this.loadStatus,
-    required this.onLeave,
-  });
-
-  factory FacultyWorkload.fromJson(Map<String, dynamic> json) {
-    return FacultyWorkload(
-      id: json['id'],
-      name: json['name'],
-      department: json['department'],
-      totalClasses: json['totalClasses'] ?? 0,
-      weeklyHours: json['weeklyHours'] ?? '0',
-      maxWeeklyHours: json['maxWeeklyHours'] ?? 24,
-      utilizationPercent: json['utilizationPercent'] ?? '0',
-      loadStatus: json['loadStatus'] ?? 'light',
-      onLeave: json['onLeave'] ?? false,
+      apiStatus: json['apiStatus'] ?? 'operational',
     );
   }
 }
 
 class RoomUtilization {
+  final String roomNumber;
   final String room;
+  final double utilizationPercentage;
+  final String utilizationPercent;
+  final int totalHours;
+  final int usedHours;
+  final int weeklyHours;
+  final String status;
   final String type;
   final int capacity;
-  final int totalClasses;
-  final String weeklyHours;
-  final String utilizationPercent;
-  final String status;
 
   RoomUtilization({
+    required this.roomNumber,
     required this.room,
+    required this.utilizationPercentage,
+    required this.utilizationPercent,
+    required this.totalHours,
+    required this.usedHours,
+    required this.weeklyHours,
+    required this.status,
     required this.type,
     required this.capacity,
-    required this.totalClasses,
-    required this.weeklyHours,
-    required this.utilizationPercent,
-    required this.status,
   });
 
   factory RoomUtilization.fromJson(Map<String, dynamic> json) {
     return RoomUtilization(
-      room: json['room'],
-      type: json['type'],
-      capacity: json['capacity'] ?? 0,
-      totalClasses: json['totalClasses'] ?? 0,
-      weeklyHours: json['weeklyHours'] ?? '0',
+      roomNumber: json['roomNumber'] ?? '',
+      room: json['room'] ?? json['roomNumber'] ?? '',
+      utilizationPercentage: (json['utilizationPercentage'] ?? 0).toDouble(),
       utilizationPercent: json['utilizationPercent'] ?? '0',
-      status: json['status'] ?? 'low',
+      totalHours: json['totalHours'] ?? 0,
+      usedHours: json['usedHours'] ?? 0,
+      weeklyHours: json['weeklyHours'] ?? 0,
+      status: json['status'] ?? 'available',
+      type: json['type'] ?? 'classroom',
+      capacity: json['capacity'] ?? 0,
+    );
+  }
+}
+
+class FacultyWorkload {
+  final String facultyName;
+  final String name;
+  final int totalClasses;
+  final int totalHours;
+  final int weeklyHours;
+  final int maxWeeklyHours;
+  final String department;
+  final String loadStatus;
+  final double utilizationPercent;
+  final bool onLeave;
+
+  FacultyWorkload({
+    required this.facultyName,
+    required this.name,
+    required this.totalClasses,
+    required this.totalHours,
+    required this.weeklyHours,
+    required this.maxWeeklyHours,
+    required this.department,
+    required this.loadStatus,
+    required this.utilizationPercent,
+    required this.onLeave,
+  });
+
+  factory FacultyWorkload.fromJson(Map<String, dynamic> json) {
+    return FacultyWorkload(
+      facultyName: json['facultyName'] ?? '',
+      name: json['name'] ?? json['facultyName'] ?? '',
+      totalClasses: json['totalClasses'] ?? 0,
+      totalHours: json['totalHours'] ?? 0,
+      weeklyHours: json['weeklyHours'] ?? 0,
+      maxWeeklyHours: json['maxWeeklyHours'] ?? 40,
+      department: json['department'] ?? '',
+      loadStatus: json['loadStatus'] ?? 'normal',
+      utilizationPercent: (json['utilizationPercent'] ?? 0).toDouble(),
+      onLeave: json['onLeave'] ?? false,
     );
   }
 }
