@@ -70,7 +70,7 @@ class _SectionTimetableScreenState extends State<SectionTimetableScreen>
           return Center(child: CircularProgressIndicator());
         }
 
-        return Padding(
+        return SingleChildScrollView(
           padding: EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

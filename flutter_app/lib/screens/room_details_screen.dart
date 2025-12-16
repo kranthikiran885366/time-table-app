@@ -58,7 +58,7 @@ class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
             );
           }
 
-          return Padding(
+          return SingleChildScrollView(
             padding: EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

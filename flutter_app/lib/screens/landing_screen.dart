@@ -157,11 +157,12 @@ class _LandingScreenState extends State<LandingScreen>
         child: SafeArea(
           child: FadeTransition(
             opacity: _fadeAnimation,
-            child: Padding(
-              padding: EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+            child: SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
                   // University Logo with animations
                   AnimatedBuilder(
                     animation: _logoController,
@@ -178,8 +179,8 @@ class _LandingScreenState extends State<LandingScreen>
                                 child: Hero(
                                   tag: 'university_logo',
                                   child: Container(
-                                    height: 150,
-                                    width: 150,
+                                    height: 120,
+                                    width: 120,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       boxShadow: [
@@ -213,7 +214,7 @@ class _LandingScreenState extends State<LandingScreen>
                       );
                     },
                   ),
-                  SizedBox(height: 32),
+                  SizedBox(height: 24),
                   
                   // University Name with slide animation
                   SlideTransition(
@@ -240,7 +241,7 @@ class _LandingScreenState extends State<LandingScreen>
                               child: Text(
                                 config.name,
                                 style: TextStyle(
-                                  fontSize: 32,
+                                  fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
                                   letterSpacing: 0.5,
@@ -276,7 +277,7 @@ class _LandingScreenState extends State<LandingScreen>
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 12),
                   
                   // Tagline with delayed animation
                   TweenAnimationBuilder<double>(
@@ -297,18 +298,18 @@ class _LandingScreenState extends State<LandingScreen>
                       child: Text(
                         config.tagline,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           color: Colors.grey[700],
                           fontStyle: FontStyle.italic,
                           fontWeight: FontWeight.w400,
                           letterSpacing: 0.3,
-                          height: 1.4,
+                          height: 1.3,
                         ),
                         textAlign: TextAlign.center,
                       ),
                     ),
                   ),
-                  SizedBox(height: 48),
+                  SizedBox(height: 32),
                   
                   // Action Buttons
                   _buildActionButton(
@@ -321,7 +322,7 @@ class _LandingScreenState extends State<LandingScreen>
                       MaterialPageRoute(builder: (context) => HomeScreen()),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 12),
                   
                   _buildActionButton(
                     icon: Icons.calendar_today,
@@ -333,7 +334,7 @@ class _LandingScreenState extends State<LandingScreen>
                       MaterialPageRoute(builder: (context) => HomeScreen()),
                     ),
                   ),
-                  SizedBox(height: 32),
+                  SizedBox(height: 24),
                   
                   // Login Options
                   Row(
@@ -363,6 +364,7 @@ class _LandingScreenState extends State<LandingScreen>
                   ),
                 ],
               ),
+            ),
             ),
           ),
         ),

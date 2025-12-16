@@ -42,10 +42,11 @@ class _AdminConfigScreenState extends State<AdminConfigScreen> {
         title: Text('University Configuration'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
             TextField(
               controller: _nameController,
               decoration: InputDecoration(
@@ -114,6 +115,7 @@ class _AdminConfigScreenState extends State<AdminConfigScreen> {
               ),
             ),
           ],
+          ),
         ),
       ),
     );
