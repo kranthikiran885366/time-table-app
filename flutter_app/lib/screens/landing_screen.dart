@@ -364,6 +364,42 @@ class _LandingScreenState extends State<LandingScreen>
                       ),
                     ],
                   ),
+                  
+                  SizedBox(height: 40),
+                  
+                  // Footer with team credits
+                  Column(
+                    children: [
+                      Text(
+                        'Developed by',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        'Kranthi • Sawdik • Kartheek',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Under the guidance of Uttejkumar',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[700],
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  SizedBox(height: 16),
                 ],
               ),
             ),

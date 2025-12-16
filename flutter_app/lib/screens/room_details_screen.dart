@@ -154,8 +154,11 @@ class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
                           itemCount: provider.timetable.length,
                           itemBuilder: (context, index) {
                             return Card(
-                              margin: EdgeInsets.only(bottom: 8),
-                              child: ClassCard(timetableEntry: provider.timetable[index]),
+                              margin: EdgeInsets.zero,
+                              child: Padding(
+                                padding: EdgeInsets.all(3.0),
+                                child: ClassCard(timetableEntry: provider.timetable[index]),
+                              ),
                             );
                           },
                         ),

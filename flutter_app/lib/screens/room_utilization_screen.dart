@@ -21,15 +21,18 @@ class _RoomUtilizationScreenState extends State<RoomUtilizationScreen> {
   }
 
   Future<void> _loadData() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
     try {
       final result = await ApiService.getRoomUtilization();
+      if (!mounted) return;
       setState(() {
         _rooms = result['rooms'];
         _summary = result['summary'];
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
   }

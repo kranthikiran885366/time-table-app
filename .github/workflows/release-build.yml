@@ -1,0 +1,135 @@
+name: Release APK and App Bundle
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.3'
+          channel: 'stable'
+          
+      - name: Get Flutter dependencies
+        working-directory: flutter_app
+        run: flutter pub get
+        
+      - name: Build APK (Split per ABI)
+        working-directory: flutter_app
+        run: flutter build apk --split-per-abi --release
+        
+      - name: Build App Bundle
+        working-directory: flutter_app
+        run: flutter build appbundle --release
+        
+      - name: Rename APK files
+        working-directory: flutter_app/build/app/outputs/flutter-apk
+        run: |
+          mv app-armeabi-v7a-release.apk timetable-app-armeabi-v7a-${{ github.ref_name }}.apk
+          mv app-arm64-v8a-release.apk timetable-app-arm64-v8a-${{ github.ref_name }}.apk
+          mv app-x86_64-release.apk timetable-app-x86_64-${{ github.ref_name }}.apk
+          
+      - name: Rename App Bundle
+        working-directory: flutter_app/build/app/outputs/bundle/release
+        run: mv app-release.aab timetable-app-${{ github.ref_name }}.aab
+        
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Timetable Management App ${{ github.ref_name }}
+          body: |
+            ## Timetable Management System
+            
+            ### What's New
+            - 3D Animated Splash Screen with advanced transitions
+            - Real-time date/time display in app bars
+            - Optimized UI with zero overflow errors
+            - Memory leak fixes
+            - Enhanced admin dashboard
+            - Team footer with credits
+            
+            ### Download Options
+            - **ARM64 (Recommended)**: For most modern Android devices
+            - **ARMv7**: For older 32-bit Android devices  
+            - **x86_64**: For Android emulators and x86 devices
+            - **App Bundle**: For Google Play Store
+            
+            ### Installation
+            1. Download the appropriate APK for your device
+            2. Enable "Install from Unknown Sources" in your device settings
+            3. Install the APK
+            
+            ### Team
+            Developed by: Kranthi • Sawdik • Kartheek
+            Under the guidance of: Uttejkumar
+            
+            ### Backend
+            Backend API: https://time-table-app-exrd.onrender.com/api
+            Admin Credentials: See documentation
+          draft: false
+          prerelease: false
+          
+      - name: Upload ARM64 APK
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: flutter_app/build/app/outputs/flutter-apk/timetable-app-arm64-v8a-${{ github.ref_name }}.apk
+          asset_name: timetable-app-arm64-v8a-${{ github.ref_name }}.apk
+          asset_content_type: application/vnd.android.package-archive
+          
+      - name: Upload ARMv7 APK
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: flutter_app/build/app/outputs/flutter-apk/timetable-app-armeabi-v7a-${{ github.ref_name }}.apk
+          asset_name: timetable-app-armeabi-v7a-${{ github.ref_name }}.apk
+          asset_content_type: application/vnd.android.package-archive
+          
+      - name: Upload x86_64 APK
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: flutter_app/build/app/outputs/flutter-apk/timetable-app-x86_64-${{ github.ref_name }}.apk
+          asset_name: timetable-app-x86_64-${{ github.ref_name }}.apk
+          asset_content_type: application/vnd.android.package-archive
+          
+      - name: Upload App Bundle
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: flutter_app/build/app/outputs/bundle/release/timetable-app-${{ github.ref_name }}.aab
+          asset_name: timetable-app-${{ github.ref_name }}.aab
+          asset_content_type: application/octet-stream

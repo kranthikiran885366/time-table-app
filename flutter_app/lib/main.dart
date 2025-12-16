@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/timetable_provider.dart';
+import 'screens/splash_screen.dart';
 import 'screens/landing_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/timetable_upload_screen.dart';
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: const SafeArea(child: LandingScreen()),
+        home: const SplashScreen(),
         debugShowCheckedModeBanner: false,
         onGenerateRoute: (RouteSettings settings) {
           try {

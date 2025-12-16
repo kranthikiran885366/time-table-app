@@ -17,10 +17,14 @@
 ![GitHub watchers](https://img.shields.io/github/watchers/kranthikiran885366/time-table-app?style=social)
 ![GitHub last commit](https://img.shields.io/github/last-commit/kranthikiran885366/time-table-app)
 ![GitHub repo size](https://img.shields.io/github/repo-size/kranthikiran885366/time-table-app)
+![GitHub release](https://img.shields.io/github/v/release/kranthikiran885366/time-table-app)
+![GitHub downloads](https://img.shields.io/github/downloads/kranthikiran885366/time-table-app/total)
 
 A comprehensive university timetable management system with Excel upload support, real-time notifications, and admin dashboard. Built with Flutter + Node.js + MongoDB.
 
-[Features](#features) • [Installation](#installation--setup) • [Documentation](#documentation) • [Contributing](#contributing) • [License](#license)
+**📱 [Download Latest Release](https://github.com/kranthikiran885366/time-table-app/releases/latest)** | **🌐 [Live Demo](https://time-table-app-exrd.onrender.com/api)**
+
+[Features](#features) • [Download](#-download) • [Installation](#installation--setup) • [Documentation](#documentation) • [Contributing](#contributing) • [License](#license)
 
 </div>
 
@@ -29,6 +33,7 @@ A comprehensive university timetable management system with Excel upload support
 ## 📋 Table of Contents
 
 - [Overview](#overview)
+- [📱 Download](#-download)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
@@ -38,6 +43,7 @@ A comprehensive university timetable management system with Excel upload support
 - [Excel Upload Feature](#excel-upload-feature)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
+- [Team](#-team)
 - [Security](#security)
 - [License](#license)
 - [Support](#support)

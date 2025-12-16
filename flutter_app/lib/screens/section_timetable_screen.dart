@@ -132,8 +132,11 @@ class _SectionTimetableScreenState extends State<SectionTimetableScreen>
                         itemCount: provider.timetable.length,
                         itemBuilder: (context, index) {
                           return Card(
-                            margin: EdgeInsets.only(bottom: 8),
-                            child: ClassCard(timetableEntry: provider.timetable[index]),
+                            margin: EdgeInsets.zero,
+                            child: Padding(
+                              padding: EdgeInsets.all(3.0),
+                              child: ClassCard(timetableEntry: provider.timetable[index]),
+                            ),
                           );
                         },
                       ),
@@ -179,8 +182,14 @@ class _SectionTimetableScreenState extends State<SectionTimetableScreen>
                       ]
                     : dayClasses
                         .map((entry) => Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                              child: ClassCard(timetableEntry: entry),
+                              padding: EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8.0),
+                              child: Card(
+                                margin: EdgeInsets.zero,
+                                child: Padding(
+                                  padding: EdgeInsets.all(3.0),
+                                  child: ClassCard(timetableEntry: entry),
+                                ),
+                              ),
                             ))
                         .toList(),
               ),

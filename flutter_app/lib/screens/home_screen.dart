@@ -59,7 +59,22 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Timetable System'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Timetable System', style: TextStyle(fontSize: 18)),
+            StreamBuilder(
+              stream: Stream.periodic(Duration(seconds: 1)),
+              builder: (context, snapshot) {
+                final now = DateTime.now();
+                return Text(
+                  '${now.day}/${now.month}/${now.year} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.normal),
+                );
+              },
+            ),
+          ],
+        ),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: SafeArea(
@@ -158,10 +173,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     else
                       DropdownButtonFormField<Section>(
                         value: _selectedSection,
+                        isExpanded: true,
                         decoration: InputDecoration(
                           labelText: 'Select Section',
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.class_),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                         ),
                         items: _sections.map((section) {
                           return DropdownMenuItem(
@@ -169,6 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Text(
                               '${section.name} - ${section.department}',
                               overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                           );
                         }).toList(),

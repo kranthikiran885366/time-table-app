@@ -15,10 +15,9 @@ class ClassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -53,62 +52,49 @@ class ClassCard extends StatelessWidget {
             ],
           ),
           if (showCountdown) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             CountdownTimer(
               endTime: timetableEntry.endTime,
               startTime: timetableEntry.startTime,
               isCurrentClass: isCurrentClass,
             ),
           ],
-          const SizedBox(height: 8),
+          const SizedBox(height: 2),
           Text(
             timetableEntry.subject.name,
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
             overflow: TextOverflow.ellipsis,
-            maxLines: 2,
+            maxLines: 1,
           ),
-          const SizedBox(height: 4),
           Text(
             'Faculty: ${timetableEntry.faculty.name}',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               color: Colors.grey[600],
             ),
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 4),
           Text(
             'Room: ${timetableEntry.room.number} (${timetableEntry.room.block})',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               color: Colors.grey[600],
             ),
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 4),
           Text(
             'Sections: ${timetableEntry.sections.map((s) => s.name).join(', ')}',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               color: Colors.grey[600],
             ),
             overflow: TextOverflow.ellipsis,
-            maxLines: 2,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Department: ${timetableEntry.subject.department}',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
         ],
-      ),
-    );
+      );
   }
 }
