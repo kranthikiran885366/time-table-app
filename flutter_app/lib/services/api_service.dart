@@ -11,10 +11,6 @@ import '../models/analytics.dart';
 
 class ApiService {
   // Backend URL Configuration
-  // For development (localhost):
-  // static const String baseUrl = 'http://localhost:5000/api';
-  
-  // For production APK:
   static const String baseUrl = 'https://time-table-app-exrd.onrender.com/api';
   
   static Future<String?> getToken() async {
