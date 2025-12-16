@@ -52,6 +52,28 @@ A comprehensive university timetable management system with Excel upload support
 
 The Timetable Management System is a full-stack application designed to simplify college schedule management. It provides a user-friendly interface for students, faculty, and administrators to view, manage, and organize class schedules efficiently.
 
+## 📱 Download
+
+### Latest Release
+[![Download APK](https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge&logo=android)](https://github.com/kranthikiran885366/time-table-app/releases/latest)
+
+### Installation Options
+
+| Platform | File | Size | Download |
+|----------|------|------|----------|
+| **Android (ARM64)** | Recommended for modern devices | ~25-30 MB | [Download](https://github.com/kranthikiran885366/time-table-app/releases/latest/download/timetable-app-arm64-v8a-latest.apk) |
+| **Android (ARMv7)** | For older 32-bit devices | ~25-30 MB | [Download](https://github.com/kranthikiran885366/time-table-app/releases/latest/download/timetable-app-armeabi-v7a-latest.apk) |
+| **Android (x86_64)** | For emulators and x86 devices | ~30-35 MB | [Download](https://github.com/kranthikiran885366/time-table-app/releases/latest/download/timetable-app-x86_64-latest.apk) |
+| **App Bundle** | For Google Play Store | ~20-25 MB | [Download](https://github.com/kranthikiran885366/time-table-app/releases/latest/download/timetable-app-latest.aab) |
+
+### Installation Steps
+1. Download the appropriate APK for your device
+2. Enable "Unknown Sources" in Settings → Security
+3. Install the APK file
+4. Launch the app and enjoy!
+
+**📝 Note**: First installation may require internet for initial setup.
+
 ### Key Highlights
 
 ✅ **Excel Upload**: Bulk upload timetables with validation and conflict detection  
@@ -362,6 +384,33 @@ After running the sample data script:
 2. Build for mobile: `flutter build apk` or `flutter build ios`
 3. Deploy web build to hosting service
 4. Distribute mobile apps through app stores
+
+## 👥 Team
+
+This project was developed by a dedicated team of developers under expert guidance.
+
+### Development Team
+- **Kranthi** - Lead Developer
+- **Sawdik** - Full Stack Developer
+- **Kartheek** - Mobile Developer
+
+### Guidance
+- **Uttejkumar** - Technical Mentor & Project Guide
+
+### Acknowledgments
+We would like to thank our mentor for the continuous support and valuable insights throughout the development of this project.
+
+---
+
+<div align="center">
+
+**Made with ❤️ by Team TimetableApp**
+
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=flat-square&logo=github)](https://github.com/kranthikiran885366/time-table-app)
+[![Issues](https://img.shields.io/badge/Issues-Report%20Bug-red?style=flat-square&logo=github)](https://github.com/kranthikiran885366/time-table-app/issues)
+[![Pull Requests](https://img.shields.io/badge/PRs-Welcome-brightgreen?style=flat-square&logo=github)](https://github.com/kranthikiran885366/time-table-app/pulls)
+
+</div>
 
 ## Future Enhancements
 
