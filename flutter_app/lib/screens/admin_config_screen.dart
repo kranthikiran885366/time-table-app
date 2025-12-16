@@ -46,6 +46,7 @@ class _AdminConfigScreenState extends State<AdminConfigScreen> {
         child: SingleChildScrollView(
           padding: EdgeInsets.all(16.0),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
             TextField(
               controller: _nameController,

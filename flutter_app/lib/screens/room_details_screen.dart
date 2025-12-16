@@ -78,10 +78,11 @@ class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
                               Text(
                                 'Current Class',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.green,
                                 ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
@@ -112,10 +113,11 @@ class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
                               Text(
                                 'Next Class',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.blue,
                                 ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),

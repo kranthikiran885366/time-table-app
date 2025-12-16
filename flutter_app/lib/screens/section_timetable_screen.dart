@@ -73,6 +73,7 @@ class _SectionTimetableScreenState extends State<SectionTimetableScreen>
         return SingleChildScrollView(
           padding: EdgeInsets.all(16.0),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (provider.currentClass != null) ...[
@@ -90,10 +91,11 @@ class _SectionTimetableScreenState extends State<SectionTimetableScreen>
                             Text(
                               'Current Class',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green,
                               ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),

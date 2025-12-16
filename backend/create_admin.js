@@ -26,22 +26,22 @@ async function createAdminUser() {
     console.log('✓ Connected to MongoDB Atlas');
 
     // Check if admin already exists
-    const existingAdmin = await Faculty.findOne({ email: '231fa04a02@gmail.com' });
+    const existingAdmin = await Faculty.findOne({ email: '231fa04a03@gmail.com' });
     
     if (existingAdmin) {
       console.log('\n⚠️  Admin user already exists!');
-      console.log('Email: 231fa04a02@gmail.com');
+      console.log('Email: 231fa04a03@gmail.com');
       console.log('Deleting old admin and creating new one...');
-      await Faculty.deleteOne({ email: '231fa04a02@gmail.com' });
+      await Faculty.deleteOne({ email: '231fa04a03@gmail.com' });
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash('admin123', 10);
+    const hashedPassword = await bcrypt.hash('admin @123', 10);
 
     // Create admin user
     const admin = new Faculty({
       name: 'Admin User',
-      email: '231fa04a02@gmail.com',
+      email: '231fa04a03@gmail.com',
       password: hashedPassword,
       role: 'admin',
       department: 'Administration',
@@ -55,8 +55,8 @@ async function createAdminUser() {
 
     console.log('\n✅ Admin user created successfully!');
     console.log('\n📋 Login Credentials:');
-    console.log('   Email: 231fa04a02@gmail.com');
-    console.log('   Password: admin123');
+    console.log('   Email: 231fa04a03@gmail.com');
+    console.log('   Password: admin @123');
     console.log('   Role: Admin');
     console.log('\n✅ You can now login to the app with these credentials!');
 

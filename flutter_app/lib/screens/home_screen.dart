@@ -66,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: SingleChildScrollView(
           padding: EdgeInsets.all(16.0),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Card(
@@ -76,7 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Text(
                       'Search by Room Number',
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontSize: 18),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 16),
                     TextField(
@@ -123,33 +125,32 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.red.shade200),
                         ),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(Icons.error, color: Colors.red),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Failed to load sections',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.red.shade900,
-                                    ),
+                            Row(
+                              children: [
+                                Icon(Icons.error, color: Colors.red),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Failed to load sections',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red.shade900,
                                   ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    _error!.replaceAll('Exception: ', ''),
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ],
-                              ),
+                                ),
+                                Spacer(),
+                                IconButton(
+                                  icon: Icon(Icons.refresh),
+                                  onPressed: _loadSections,
+                                  tooltip: 'Retry',
+                                ),
+                              ],
                             ),
-                            IconButton(
-                              icon: Icon(Icons.refresh),
-                              onPressed: _loadSections,
-                              tooltip: 'Retry',
+                            SizedBox(height: 4),
+                            Text(
+                              _error!.replaceAll('Exception: ', ''),
+                              style: TextStyle(fontSize: 12),
                             ),
                           ],
                         ),
@@ -165,7 +166,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         items: _sections.map((section) {
                           return DropdownMenuItem(
                             value: section,
-                            child: Text('${section.name} - ${section.department}'),
+                            child: Text(
+                              '${section.name} - ${section.department}',
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           );
                         }).toList(),
                         onChanged: (section) {

@@ -241,13 +241,15 @@ class _LandingScreenState extends State<LandingScreen>
                               child: Text(
                                 config.name,
                                 style: TextStyle(
-                                  fontSize: 28,
+                                  fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
                                   letterSpacing: 0.5,
                                   height: 1.2,
                                 ),
                                 textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 3,
                               ),
                             ),
                             SizedBox(height: 4),

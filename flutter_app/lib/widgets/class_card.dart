@@ -23,14 +23,18 @@ class ClassCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '${timetableEntry.startTime} - ${timetableEntry.endTime}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
+              Expanded(
+                child: Text(
+                  '${timetableEntry.startTime} - ${timetableEntry.endTime}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+              SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
@@ -63,6 +67,8 @@ class ClassCard extends StatelessWidget {
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
           ),
           const SizedBox(height: 4),
           Text(
@@ -71,6 +77,7 @@ class ClassCard extends StatelessWidget {
               fontSize: 14,
               color: Colors.grey[600],
             ),
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
           Text(
@@ -79,6 +86,7 @@ class ClassCard extends StatelessWidget {
               fontSize: 14,
               color: Colors.grey[600],
             ),
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
           Text(
@@ -87,6 +95,8 @@ class ClassCard extends StatelessWidget {
               fontSize: 14,
               color: Colors.grey[600],
             ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
           ),
           const SizedBox(height: 4),
           Text(
@@ -95,6 +105,7 @@ class ClassCard extends StatelessWidget {
               fontSize: 14,
               color: Colors.grey[600],
             ),
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
