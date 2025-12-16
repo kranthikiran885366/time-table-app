@@ -21,18 +21,24 @@ void main() async {
     debugPrint('Flutter Error: ${details.exception}');
   };
   
+  // Initialize notification service with complete error handling
   try {
-    // Initialize notification service with fallback
-    await NotificationService().initialize();
+    await NotificationService().initialize().timeout(
+      const Duration(seconds: 3),
+      onTimeout: () {
+        debugPrint('Notification initialization timed out');
+      },
+    );
   } catch (e) {
     debugPrint('Failed to initialize notifications: $e');
+    // Continue without notifications
   }
   
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

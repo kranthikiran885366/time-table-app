@@ -16,33 +16,41 @@ class NotificationService {
 
   Future<void> initialize() async {
     if (_initialized) return;
-
-    // Initialize timezone
-    tz.initializeTimeZones();
-
-    // Android initialization settings
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    // iOS initialization settings
-    const DarwinInitializationSettings iosSettings =
-        DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
-
-    const InitializationSettings initSettings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
-    );
-
-    await _notifications.initialize(
-      initSettings,
-      onDidReceiveNotificationResponse: _onNotificationTapped,
-    );
-
-    _initialized = true;
+    
+    try {
+      // Initialize timezone data
+      tz.initializeTimeZones();
+      
+      // Android initialization settings
+      const AndroidInitializationSettings initializationSettingsAndroid =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+      
+      // iOS initialization settings
+      const DarwinInitializationSettings initializationSettingsIOS =
+          DarwinInitializationSettings(
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+      );
+      
+      // Combined initialization settings
+      const InitializationSettings initializationSettings =
+          InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsIOS,
+      );
+      
+      // Initialize the plugin
+      await _notifications.initialize(
+        initializationSettings,
+        onDidReceiveNotificationResponse: _onNotificationTapped,
+      );
+      
+      _initialized = true;
+    } catch (e) {
+      print('Notification initialization failed: $e');
+      _initialized = false;
+    }
   }
 
   void _onNotificationTapped(NotificationResponse response) {
@@ -69,6 +77,13 @@ class NotificationService {
     try {
       final now = DateTime.now();
       final timeParts = classEntry.startTime.split(':');
+      
+      // Null safety check
+      if (timeParts.length < 2) {
+        print('Invalid time format: ${classEntry.startTime}');
+        return;
+      }
+      
       final classStartTime = DateTime(
         now.year,
         now.month,

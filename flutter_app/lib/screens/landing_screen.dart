@@ -6,6 +6,8 @@ import 'home_screen.dart';
 import 'login_screen.dart';
 
 class LandingScreen extends StatefulWidget {
+  const LandingScreen({super.key});
+  
   @override
   _LandingScreenState createState() => _LandingScreenState();
 }
@@ -81,22 +83,39 @@ class _LandingScreenState extends State<LandingScreen>
   }
 
   Future<void> _loadUniversityConfig() async {
-    try {
-      final config = await ApiService.getUniversityConfig();
+    // Set default config first to prevent crashes
+    final defaultConfig = UniversityConfig(
+      name: 'Timetable Management',
+      tagline: 'Manage your schedule efficiently',
+      logoUrl: '',
+      primaryColor: '#673AB7',
+    );
+    
+    if (mounted) {
       setState(() {
-        _universityConfig = config;
+        _universityConfig = defaultConfig;
         _isLoading = false;
       });
       
-      // Stagger animations
+      // Start animations immediately
       _logoController.forward();
-      await Future.delayed(Duration(milliseconds: 300));
+      await Future.delayed(const Duration(milliseconds: 300));
       _animationController.forward();
+    }
+    
+    // Try to load config from API in background
+    try {
+      final config = await ApiService.getUniversityConfig().timeout(
+        const Duration(seconds: 5),
+      );
+      if (mounted) {
+        setState(() {
+          _universityConfig = config;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      _animationController.forward();
+      debugPrint('Failed to load university config: $e');
+      // Keep using default config
     }
   }
 
@@ -104,18 +123,23 @@ class _LandingScreenState extends State<LandingScreen>
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: const CircularProgressIndicator()),
       );
     }
 
-    final config = _universityConfig;
-    if (config == null) {
-      return Scaffold(
-        body: Center(child: Text('Failed to load configuration')),
-      );
-    }
+    final config = _universityConfig ?? UniversityConfig(
+      name: 'Timetable Management',
+      tagline: 'Manage your schedule efficiently',
+      logoUrl: '',
+      primaryColor: '#673AB7',
+    );
 
-    final primaryColor = Color(int.parse(config.primaryColor.replaceFirst('#', '0xFF')));
+    Color primaryColor;
+    try {
+      primaryColor = Color(int.parse(config.primaryColor.replaceFirst('#', '0xFF')));
+    } catch (e) {
+      primaryColor = Colors.deepPurple;
+    }
 
     return Scaffold(
       body: Container(
